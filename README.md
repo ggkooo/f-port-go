@@ -1,8 +1,11 @@
-# PortGO Authentication System
+# PortGO Authentication & Learning Dashboard
 
-A modern, responsive authentication system built with React, TypeScript, and Vite. This application provides a complete authentication flow including login, registration, and password recovery pages with beautiful dark mode support.
+A modern, responsive web app built with React, TypeScript, and Vite. The project now includes both a complete authentication flow (login, registration, and password recovery) and a Home learning dashboard with study modules, streak tracking, and daily challenges.
 
 ## 📸 Screenshots
+
+### Home Page
+![Home Page](README-images/home-page.png)
 
 ### Login Page
 ![Login Page](README-images/login-page.png)
@@ -19,6 +22,11 @@ A modern, responsive authentication system built with React, TypeScript, and Vit
   - User login
   - User registration
   - Password recovery
+
+- 🏠 **Learning Dashboard (Home)**
+  - Study modules overview
+  - Current streak highlight
+  - Daily challenges with progress bars and XP badges
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -84,6 +92,13 @@ f-port-go/
 │               ├── ForgotPasswordContainer.tsx
 │               ├── ForgotPasswordForm.tsx
 │               └── ForgotPasswordLeftPanel.tsx
+│       └── Home/
+│           ├── index.tsx
+│           └── components/
+│               ├── HomeContainer.tsx
+│               ├── HomeLeftSidebar.tsx
+│               ├── HomeMainContent.tsx
+│               └── HomeRightPanel.tsx
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -133,7 +148,7 @@ npm run dev
 - `/login` - Login page
 - `/register` - Registration page
 - `/forgot-password` - Password recovery page
-- `/` - Redirects to login page
+- `/` - Home dashboard page
 
 ### Components
 
