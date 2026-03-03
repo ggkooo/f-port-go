@@ -14,10 +14,10 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
   };
 
   return (
-    <div className="w-full md:w-1/2 p-10 md:p-24 flex flex-col justify-center bg-white dark:bg-neutral-900">
+    <div className="w-full md:w-1/2 p-6 md:p-10 xl:p-14 flex flex-col justify-center bg-white dark:bg-neutral-900 h-full">
       <div className="max-w-sm mx-auto w-full">
         {/* Header */}
-        <header className="mb-12">
+        <header className="mb-8">
           <h1 className="text-3xl font-extrabold text-neutral-900 dark:text-white mb-3">
             Cadastre-se no PortGO
           </h1>
@@ -35,7 +35,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] text-blue-900 font-extrabold py-5 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-6 flex items-center justify-center gap-3 group"
+            className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] text-blue-900 font-extrabold py-4 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-3 group"
           >
             <span className="text-lg">Criar Conta</span>
             <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1.5">
@@ -45,7 +45,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
         </form>
 
         {/* Login Section */}
-        <div className="mt-10 text-center">
+        <div className="mt-7 text-center">
           <p className="text-neutral-500 dark:text-neutral-400 font-semibold mb-2">
             Já tem uma conta?
           </p>
