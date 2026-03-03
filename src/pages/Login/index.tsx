@@ -1,11 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  LoginLeftPanel,
   LoginForm,
-  LoginContainer,
 } from "./components";
-import { BrowserHeader, DarkModeToggle } from "../../components";
+import { BrowserHeader, DarkModeToggle, LeftPanel, PageContainer } from "../../components";
 
 function Login() {
   const navigate = useNavigate();
@@ -40,16 +38,20 @@ function Login() {
       `}</style>
       
       <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
-        <LoginContainer>
+        <PageContainer size="compact">
           <BrowserHeader url="portgo.com.br/login" />
           <div className="flex flex-1 min-h-0 flex-col md:flex-row">
-            <LoginLeftPanel />
+            <LeftPanel
+              title="Bem-vindo de"
+              titleHighlight="volta!"
+              description="Estamos felizes em ver você novamente. Pronto para continuar sua jornada no aprendizado de Português?"
+            />
             <LoginForm
               onSubmit={handleLoginSubmit}
               onForgotClick={handleForgotPassword}
             />
           </div>
-        </LoginContainer>
+        </PageContainer>
         <DarkModeToggle />
       </div>
     </>

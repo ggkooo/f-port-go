@@ -1,13 +1,20 @@
 import { useNavigate } from "react-router-dom";
 
-const navItems = [
-  { icon: "home", active: false, path: "/" },
-  { icon: "shopping_basket", active: false, path: "/store" },
-  { icon: "leaderboard", active: true, path: "/ranking" },
-  { icon: "calendar_today", active: false, path: "/calendar" },
+type AppRoute = "/" | "/store" | "/ranking" | "/calendar";
+
+interface AppLeftSidebarProps {
+  activePath?: AppRoute;
+  showStoreNotification?: boolean;
+}
+
+const navItems: Array<{ icon: string; path: AppRoute }> = [
+  { icon: "home", path: "/" },
+  { icon: "shopping_basket", path: "/store" },
+  { icon: "leaderboard", path: "/ranking" },
+  { icon: "calendar_today", path: "/calendar" },
 ];
 
-export function RankingLeftSidebar() {
+export function AppLeftSidebar({ activePath, showStoreNotification = false }: AppLeftSidebarProps) {
   const navigate = useNavigate();
 
   return (
@@ -17,24 +24,28 @@ export function RankingLeftSidebar() {
       </div>
 
       <nav className="flex flex-col gap-4 flex-1">
-        {navItems.map(({ icon, active, path }) => (
-          <button
-            key={icon}
-            type="button"
-            onClick={() => {
-              if (path) {
-                navigate(path);
-              }
-            }}
-            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm relative transition-colors ${
-              active
-                ? "bg-neutral-900 dark:bg-blue-500 text-white"
-                : "bg-white dark:bg-neutral-700 text-neutral-500"
-            }`}
-          >
-            <span className="material-symbols-outlined">{icon}</span>
-          </button>
-        ))}
+        {navItems.map(({ icon, path }) => {
+          const isActive = activePath === path;
+          const hasNotification = showStoreNotification && path === "/store";
+
+          return (
+            <button
+              key={icon}
+              type="button"
+              onClick={() => navigate(path)}
+              className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm relative transition-colors ${
+                isActive
+                  ? "bg-neutral-900 dark:bg-blue-500 text-white"
+                  : "bg-white dark:bg-neutral-700 text-neutral-500"
+              }`}
+            >
+              <span className="material-symbols-outlined">{icon}</span>
+              {hasNotification && (
+                <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-neutral-100 dark:border-neutral-800" />
+              )}
+            </button>
+          );
+        })}
       </nav>
 
       <div className="flex flex-col gap-4 mt-auto">

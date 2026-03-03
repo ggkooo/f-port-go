@@ -1,7 +1,5 @@
-import { BrowserHeader, DarkModeToggle } from "../../components";
+import { AppLeftSidebar, BrowserHeader, DarkModeToggle, PageContainer } from "../../components";
 import {
-  RankingContainer,
-  RankingLeftSidebar,
   RankingMainContent,
   RankingRightPanel,
 } from "./components";
@@ -10,15 +8,15 @@ function Ranking() {
   return (
     <>
       <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
-        <RankingContainer>
+        <PageContainer>
           <BrowserHeader url="portgo.com.br/ranking" />
 
           <div className="flex flex-1 min-h-0 bg-[#F0F4F8] dark:bg-neutral-950 overflow-hidden">
-            <RankingLeftSidebar />
+            <AppLeftSidebar activePath="/ranking" />
             <RankingMainContent />
             <RankingRightPanel />
           </div>
-        </RankingContainer>
+        </PageContainer>
 
         <DarkModeToggle />
       </div>

@@ -1,7 +1,5 @@
-import { BrowserHeader, DarkModeToggle } from "../../components";
+import { AppLeftSidebar, BrowserHeader, DarkModeToggle, PageContainer } from "../../components";
 import {
-    HomeContainer,
-    HomeLeftSidebar,
     HomeMainContent,
     HomeRightPanel,
 } from "./components";
@@ -10,15 +8,15 @@ function Home() {
     return (
         <>
             <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
-                <HomeContainer>
+                <PageContainer>
                     <BrowserHeader url="portgo.com.br/dashboard" />
 
                     <div className="flex flex-1 min-h-0 bg-[#F0F4F8] dark:bg-neutral-950 overflow-hidden">
-                        <HomeLeftSidebar />
+                        <AppLeftSidebar activePath="/" showStoreNotification />
                         <HomeMainContent />
                         <HomeRightPanel />
                     </div>
-                </HomeContainer>
+                </PageContainer>
 
                 <DarkModeToggle />
             </div>

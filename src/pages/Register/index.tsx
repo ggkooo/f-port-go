@@ -1,10 +1,8 @@
 import React from "react";
 import {
-  RegisterLeftPanel,
   RegisterForm,
-  RegisterContainer,
 } from "./components";
-import { BrowserHeader, DarkModeToggle } from "../../components";
+import { BrowserHeader, DarkModeToggle, LeftPanel, PageContainer } from "../../components";
 function Register() {
   const handleRegisterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("Form submitted", e);
@@ -32,15 +30,23 @@ function Register() {
       `}</style>
       
       <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
-        <RegisterContainer>
+        <PageContainer size="compact">
           <BrowserHeader url="portgo.com.br/cadastro" />
           <div className="flex flex-1 min-h-0 flex-col md:flex-row">
-            <RegisterLeftPanel />
+            <LeftPanel
+              title="Crie sua"
+              titleHighlight="conta"
+              description="Comece sua jornada no aprendizado de Português hoje mesmo!"
+              variant="register"
+              cardIcon="group"
+              cardTitle="Junte-se a +1000 alunos"
+              cardDescription="Aprenda com a melhor comunidade."
+            />
             <RegisterForm
               onSubmit={handleRegisterSubmit}
             />
           </div>
-        </RegisterContainer>
+        </PageContainer>
         <DarkModeToggle />
       </div>
     </>
