@@ -4,7 +4,7 @@ const navItems = [
   { icon: "home", active: true, path: "/" },
   { icon: "shopping_basket", active: false, hasNotification: true, path: "/store" },
   { icon: "leaderboard", active: false, path: "/ranking" },
-  { icon: "calendar_today", active: false },
+  { icon: "calendar_today", active: false, path: "/calendar" },
 ];
 
 export function HomeLeftSidebar() {
