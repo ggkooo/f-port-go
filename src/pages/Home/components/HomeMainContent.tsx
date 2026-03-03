@@ -5,17 +5,17 @@ const studyModules = [
     key: "grammar",
     title: "Gramática",
     icon: "text_fields",
-    containerClass: "bg-[#D4EAFC]",
-    iconClass: "text-blue-700",
-    textClass: "text-blue-900",
+    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
+    iconClass: "text-blue-700 dark:text-blue-200",
+    textClass: "text-blue-900 dark:text-blue-100",
   },
   {
     key: "reading",
     title: "Interpretação Textual",
     icon: "auto_stories",
-    containerClass: "bg-[#A3E4A1]/60",
-    iconClass: "text-emerald-700",
-    textClass: "text-emerald-900",
+    containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
+    iconClass: "text-emerald-700 dark:text-emerald-200",
+    textClass: "text-emerald-900 dark:text-emerald-100",
   },
 ];
 
@@ -25,9 +25,9 @@ const dailyChallenges = [
     progress: 60,
     progressLabel: "9/15 min",
     xpLabel: "50XP",
-    containerClass: "bg-[#D4EAFC]",
-    textClass: "text-blue-900",
-    subTextClass: "text-blue-700",
+    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
+    textClass: "text-blue-900 dark:text-blue-100",
+    subTextClass: "text-blue-700 dark:text-blue-200",
     progressClass: "bg-blue-500 dark:bg-blue-400",
   },
   {
@@ -35,9 +35,9 @@ const dailyChallenges = [
     progress: 33,
     progressLabel: "1/3 lições",
     xpLabel: "50XP",
-    containerClass: "bg-[#A3E4A1]/60",
-    textClass: "text-emerald-900",
-    subTextClass: "text-emerald-700",
+    containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
+    textClass: "text-emerald-900 dark:text-emerald-100",
+    subTextClass: "text-emerald-700 dark:text-emerald-200",
     progressClass: "bg-emerald-500 dark:bg-emerald-400",
   },
   {
@@ -45,9 +45,9 @@ const dailyChallenges = [
     progress: 50,
     progressLabel: "1/2 lições",
     xpLabel: "70XP",
-    containerClass: "bg-[#FDE68A]",
-    textClass: "text-amber-900",
-    subTextClass: "text-amber-700",
+    containerClass: "bg-[#FDE68A] dark:bg-amber-900/30",
+    textClass: "text-amber-900 dark:text-amber-100",
+    subTextClass: "text-amber-700 dark:text-amber-200",
     progressClass: "bg-amber-500 dark:bg-amber-400",
   },
 ];
@@ -56,7 +56,7 @@ export function HomeMainContent() {
   const navigate = useNavigate();
 
   return (
-    <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8">
+    <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white mb-5 leading-tight">
           Dashboard de Aprendizado
@@ -65,8 +65,8 @@ export function HomeMainContent() {
         <div className="bg-white dark:bg-neutral-800 p-5 md:p-6 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#FDE68A] flex items-center justify-center">
-                <span className="material-symbols-outlined text-amber-700">local_fire_department</span>
+              <div className="w-10 h-10 rounded-full bg-[#FDE68A] dark:bg-amber-900/30 flex items-center justify-center">
+                <span className="material-symbols-outlined text-amber-700 dark:text-amber-200">local_fire_department</span>
               </div>
               <div>
                 <h3 className="font-bold text-neutral-900 dark:text-white">Ofensiva Atual</h3>
@@ -108,8 +108,8 @@ export function HomeMainContent() {
 
         <div className="bg-white dark:bg-neutral-800 p-5 md:p-6 rounded-2xl md:rounded-large border border-neutral-100 dark:border-neutral-700 shadow-sm md:col-start-2 md:row-start-1 md:row-span-2 flex flex-col">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-[#D4EAFC] flex items-center justify-center">
-              <span className="material-symbols-outlined text-blue-700">target</span>
+            <div className="w-10 h-10 rounded-full bg-[#D4EAFC] dark:bg-blue-900/30 flex items-center justify-center">
+              <span className="material-symbols-outlined text-blue-700 dark:text-blue-200">target</span>
             </div>
             <h3 className="font-bold text-neutral-900 dark:text-white text-lg">Desafios do Dia</h3>
           </div>
@@ -118,14 +118,14 @@ export function HomeMainContent() {
             {dailyChallenges.map((challenge) => (
               <li
                 key={challenge.title}
-                className={`${challenge.containerClass} dark:bg-neutral-700 rounded-2xl px-4 py-3`}
+                className={`${challenge.containerClass} rounded-2xl px-4 py-3`}
               >
                 <div className="flex items-center justify-between gap-3 mb-2">
-                  <p className={`text-sm md:text-base ${challenge.textClass} dark:text-neutral-100 font-semibold leading-snug`}>
+                  <p className={`text-sm md:text-base ${challenge.textClass} font-semibold leading-snug`}>
                     {challenge.title}
                   </p>
                   <div className="flex items-center gap-2 whitespace-nowrap">
-                    <span className={`text-[11px] md:text-xs ${challenge.subTextClass} dark:text-neutral-300 font-bold`}>
+                    <span className={`text-[11px] md:text-xs ${challenge.subTextClass} font-bold`}>
                       {challenge.progressLabel}
                     </span>
                     <span className="text-[10px] md:text-xs font-extrabold px-2 py-1 rounded-full bg-white/80 dark:bg-neutral-600 text-neutral-800 dark:text-neutral-100">

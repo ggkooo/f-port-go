@@ -4,46 +4,46 @@ const xpPotions = [
     multiplier: "1.5x XP",
     duration: "Duração: 24h",
     price: "120 moedas",
-    containerClass: "bg-[#D4EAFC]",
+    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
     badgeClass: "bg-blue-500",
-    textClass: "text-blue-900",
-    subTextClass: "text-blue-700",
+    textClass: "text-blue-900 dark:text-blue-100",
+    subTextClass: "text-blue-700 dark:text-blue-200",
   },
   {
     name: "Poção de XP 2x",
     multiplier: "2x XP",
     duration: "Duração: 24h",
     price: "180 moedas",
-    containerClass: "bg-[#E9F3FF]",
+    containerClass: "bg-[#E9F3FF] dark:bg-blue-900/20",
     badgeClass: "bg-blue-600",
-    textClass: "text-blue-900",
-    subTextClass: "text-blue-700",
+    textClass: "text-blue-900 dark:text-blue-100",
+    subTextClass: "text-blue-700 dark:text-blue-200",
   },
   {
     name: "Poção de XP 2.5x",
     multiplier: "2.5x XP",
     duration: "Duração: 24h",
     price: "240 moedas",
-    containerClass: "bg-[#A3E4A1]/60",
+    containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
     badgeClass: "bg-emerald-500",
-    textClass: "text-emerald-900",
-    subTextClass: "text-emerald-700",
+    textClass: "text-emerald-900 dark:text-emerald-100",
+    subTextClass: "text-emerald-700 dark:text-emerald-200",
   },
   {
     name: "Poção de XP 3x",
     multiplier: "3x XP",
     duration: "Duração: 12h",
     price: "300 moedas",
-    containerClass: "bg-[#FDE68A]",
+    containerClass: "bg-[#FDE68A] dark:bg-amber-900/30",
     badgeClass: "bg-amber-500",
-    textClass: "text-amber-900",
-    subTextClass: "text-amber-700",
+    textClass: "text-amber-900 dark:text-amber-100",
+    subTextClass: "text-amber-700 dark:text-amber-200",
   },
 ];
 
 export function StoreMainContent() {
   return (
-    <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 overflow-y-auto">
+    <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white mb-4 leading-tight">
           Loja de Itens
@@ -52,8 +52,8 @@ export function StoreMainContent() {
         <div className="bg-white dark:bg-neutral-800 p-5 md:p-6 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#FDE68A] flex items-center justify-center">
-                <span className="material-symbols-outlined text-amber-700">local_fire_department</span>
+              <div className="w-10 h-10 rounded-full bg-[#FDE68A] dark:bg-amber-900/30 flex items-center justify-center">
+                <span className="material-symbols-outlined text-amber-700 dark:text-amber-200">local_fire_department</span>
               </div>
               <div>
                 <h3 className="font-bold text-neutral-900 dark:text-white">Melhore sua evolução</h3>
@@ -72,8 +72,8 @@ export function StoreMainContent() {
 
       <section className="mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-[#D4EAFC] flex items-center justify-center">
-            <span className="material-symbols-outlined text-blue-700">bolt</span>
+          <div className="w-10 h-10 rounded-full bg-[#D4EAFC] dark:bg-blue-900/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-blue-700 dark:text-blue-200">bolt</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">Poções de XP</h2>
         </div>
@@ -82,7 +82,7 @@ export function StoreMainContent() {
           {xpPotions.map((potion) => (
             <article
               key={potion.name}
-              className={`${potion.containerClass} dark:bg-neutral-700 rounded-2xl md:rounded-large p-5 flex flex-col gap-4`}
+              className={`${potion.containerClass} rounded-2xl md:rounded-large p-5 flex flex-col gap-4`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -91,10 +91,10 @@ export function StoreMainContent() {
                   </div>
 
                   <div>
-                    <h3 className={`font-bold text-base md:text-lg ${potion.textClass} dark:text-neutral-100`}>
+                    <h3 className={`font-bold text-base md:text-lg ${potion.textClass}`}>
                       {potion.name}
                     </h3>
-                    <p className={`text-sm ${potion.subTextClass} dark:text-neutral-300 mt-1`}>{potion.duration}</p>
+                    <p className={`text-sm ${potion.subTextClass} mt-1`}>{potion.duration}</p>
                   </div>
                 </div>
 
@@ -104,7 +104,7 @@ export function StoreMainContent() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className={`font-extrabold ${potion.textClass} dark:text-neutral-100`}>{potion.price}</span>
+                <span className={`font-extrabold ${potion.textClass}`}>{potion.price}</span>
                 <button
                   type="button"
                   className="px-4 py-2 rounded-full bg-white/80 dark:bg-neutral-600 text-neutral-900 dark:text-neutral-100 text-sm font-semibold hover:opacity-90 transition-opacity"
@@ -119,8 +119,8 @@ export function StoreMainContent() {
 
       <section>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-[#D4EAFC] flex items-center justify-center">
-            <span className="material-symbols-outlined text-blue-700">ac_unit</span>
+          <div className="w-10 h-10 rounded-full bg-[#D4EAFC] dark:bg-blue-900/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-blue-700 dark:text-blue-200">ac_unit</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">Proteção de Ofensiva</h2>
         </div>

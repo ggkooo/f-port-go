@@ -1,4 +1,4 @@
-import { AppLeftSidebar, BrowserHeader, DarkModeToggle, PageContainer } from "../../components";
+import { AppLeftSidebar, BrowserHeader, PageContainer } from "../../components";
 import {
     HomeMainContent,
     HomeRightPanel,
@@ -7,7 +7,7 @@ import {
 function Home() {
     return (
         <>
-            <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
+            <div className="h-screen w-screen overflow-hidden flex items-center justify-center px-0 pt-0 pb-0 sm:px-2 sm:pt-2 sm:pb-0 md:px-4 md:pt-4 md:pb-0 lg:p-4">
                 <PageContainer>
                     <BrowserHeader />
 
@@ -18,7 +18,6 @@ function Home() {
                     </div>
                 </PageContainer>
 
-                <DarkModeToggle />
             </div>
         </>
     );
