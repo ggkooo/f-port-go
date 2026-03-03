@@ -18,10 +18,10 @@ export function LoginForm({
   };
 
   return (
-    <div className="w-full md:w-1/2 p-10 md:p-24 flex flex-col justify-center bg-white dark:bg-neutral-900">
+    <div className="w-full md:w-1/2 p-6 md:p-10 xl:p-14 flex flex-col justify-center bg-white dark:bg-neutral-900 h-full">
       <div className="max-w-sm mx-auto w-full">
         {/* Header */}
-        <header className="mb-12">
+        <header className="mb-8">
           <h1 className="text-3xl font-extrabold text-neutral-900 dark:text-white mb-3">
             Entrar no PortGO
           </h1>
@@ -31,7 +31,7 @@ export function LoginForm({
         </header>
 
         {/* Form */}
-        <form action="#" className="space-y-6" onSubmit={handleSubmit}>
+        <form action="#" className="space-y-5" onSubmit={handleSubmit}>
           <EmailInput id="email" placeholder="seu@email.com" />
           <PasswordInput
             id="password"
@@ -42,7 +42,7 @@ export function LoginForm({
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] text-blue-900 font-extrabold py-5 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-3 group"
+            className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] text-blue-900 font-extrabold py-4 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-3 flex items-center justify-center gap-3 group"
           >
             <span className="text-lg">Entrar</span>
             <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1.5">
@@ -52,7 +52,7 @@ export function LoginForm({
         </form>
 
         {/* Sign Up Section */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 text-center">
           <p className="text-neutral-500 dark:text-neutral-400 font-semibold mb-2">
             Novo no PortGO?
           </p>
