@@ -1,73 +1,201 @@
-# React + TypeScript + Vite
+# PortGO Authentication System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive authentication system built with React, TypeScript, and Vite. This application provides a complete authentication flow including login, registration, and password recovery pages with beautiful dark mode support.
 
-Currently, two official plugins are available:
+## 📸 Screenshots
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Login Page
+![Login Page](README-images/login-page.png)
 
-## React Compiler
+### Register Page
+![Register Page](README-images/register-page.png)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Forgot Password Page
+![Forgot Password Page](README-images/forgot-password-page.png)
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 🔐 **Complete Authentication Flow**
+  - User login
+  - User registration
+  - Password recovery
+  
+- 🎨 **Modern UI/UX**
+  - Clean and intuitive interface
+  - Responsive design (mobile-first approach)
+  - Split-panel layout with decorative left panel
+  - Material Symbols icons integration
+  
+- 🌓 **Dark Mode Support**
+  - Toggle between light and dark themes
+  - Persistent theme preference
+  - Smooth transitions between themes
+  
+- ♿ **Accessibility**
+  - Semantic HTML
+  - Proper form labels and ARIA attributes
+  - Keyboard navigation support
+  
+- 📱 **Fully Responsive**
+  - Works seamlessly on desktop, tablet, and mobile devices
+  - Adaptive layouts for different screen sizes
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **React 19.2** - UI library
+- **TypeScript** - Type safety
+- **Vite 7.3** - Build tool and dev server
+- **React Router DOM 7.13** - Client-side routing
+- **Tailwind CSS** - Utility-first CSS (via custom config)
+- **ESLint** - Code linting
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📁 Project Structure
+
+```
+f-port-go/
+├── src/
+│   ├── App.tsx                      # Main app component with routing
+│   ├── main.tsx                     # Application entry point
+│   ├── index.css                    # Global styles
+│   ├── components/                  # Shared components
+│   │   ├── BrowserHeader.tsx
+│   │   ├── DarkModeToggle.tsx
+│   │   ├── EmailInput.tsx
+│   │   ├── NameInput.tsx
+│   │   ├── PasswordInput.tsx
+│   │   ├── LeftPanel.tsx
+│   │   └── index.ts
+│   └── pages/                       # Page components
+│       ├── Login/
+│       │   ├── index.tsx
+│       │   └── components/
+│       │       ├── LoginContainer.tsx
+│       │       ├── LoginForm.tsx
+│       │       └── LoginLeftPanel.tsx
+│       ├── Register/
+│       │   ├── index.tsx
+│       │   └── components/
+│       │       ├── RegisterContainer.tsx
+│       │       ├── RegisterForm.tsx
+│       │       └── RegisterLeftPanel.tsx
+│       └── ForgotPassword/
+│           ├── index.tsx
+│           └── components/
+│               ├── ForgotPasswordContainer.tsx
+│               ├── ForgotPasswordForm.tsx
+│               └── ForgotPasswordLeftPanel.tsx
+├── public/                          # Static assets
+├── README-images/                   # Screenshots for documentation
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── eslint.config.js
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ggkooo/f-port-go.git
+cd f-port-go
 ```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## 📜 Available Scripts
+
+- `npm run dev` - Start the development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint to check code quality
+
+## 🎯 Usage
+
+### Routes
+
+- `/login` - Login page
+- `/register` - Registration page
+- `/forgot-password` - Password recovery page
+- `/` - Redirects to login page
+
+### Components
+
+#### Shared Components
+
+- **EmailInput** - Reusable email input with validation
+- **PasswordInput** - Password input with show/hide toggle
+- **NameInput** - Name input component
+- **DarkModeToggle** - Theme switcher component
+- **BrowserHeader** - Mock browser chrome header
+- **LeftPanel** - Decorative panel for authentication pages
+
+#### Page Components
+
+Each page follows a modular structure:
+- **Container** - Layout wrapper
+- **Form** - Form logic and submission
+- **LeftPanel** - Custom decorative panel for the page
+
+## 🎨 Styling
+
+The application uses Tailwind CSS for styling with a custom dark mode implementation. The color scheme includes:
+
+- **Primary**: Blue tones (#D4EAFC, #C2E2FF)
+- **Accent**: Emerald for highlights
+- **Neutral**: Comprehensive grayscale palette
+- **Dark mode**: Full support with neutral-900 backgrounds
+
+## 🔧 Configuration
+
+### TypeScript
+
+The project uses strict TypeScript configuration split into:
+- `tsconfig.app.json` - Application code
+- `tsconfig.node.json` - Build tooling
+
+### Vite
+
+Minimal Vite configuration with React plugin enabled. See [vite.config.ts](vite.config.ts) for details.
+
+### ESLint
+
+Modern flat config format with React-specific rules. See [eslint.config.js](eslint.config.js) for the complete setup.
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is private and not licensed for public use.
+
+## 🙏 Acknowledgments
+
+- Material Symbols for icons
+- React community for excellent tooling
+- Vite team for the blazing-fast build tool
+
+---
+
+Built with ❤️ using React, TypeScript, and Vite
