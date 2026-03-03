@@ -18,11 +18,6 @@ function Login() {
     // TODO: Implementar redirecionamento para página de recuperação de senha
   };
 
-  const handleSignUp = () => {
-    console.log("Sign up clicked");
-    // TODO: Implementar redirecionamento para página de cadastro
-  };
-
   return (
     <>
       <style>{`
@@ -51,7 +46,6 @@ function Login() {
             <LoginForm
               onSubmit={handleLoginSubmit}
               onForgotClick={handleForgotPassword}
-              onSignUpClick={handleSignUp}
             />
           </div>
         </LoginContainer>

@@ -1,17 +1,18 @@
 interface LoginFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
-  onSignUpClick?: () => void;
   onForgotClick?: () => void;
 }
 
 import { EmailInput } from "./EmailInput";
 import { PasswordInput } from "./PasswordInput";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm({
   onSubmit,
-  onSignUpClick,
   onForgotClick,
 }: LoginFormProps) {
+  const navigate = useNavigate();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit?.(e);
@@ -58,11 +59,11 @@ export function LoginForm({
           </p>
           <button
             type="button"
-            onClick={onSignUpClick}
+            onClick={() => navigate("/register")}
             className="inline-block text-neutral-900 dark:text-white font-extrabold text-lg relative group transition-colors"
           >
             Criar Conta
-            <span className="absolute -bottom-1 left-0 w-full h-1.5 bg-accent-green/40 group-hover:bg-accent-green/70 transition-all rounded-full -z-10"></span>
+            <span className="absolute -bottom-1 left-0 w-full h-1.5 bg-emerald-400/30 group-hover:bg-emerald-400/50 transition-all rounded-full -z-10"></span>
           </button>
         </div>
       </div>
