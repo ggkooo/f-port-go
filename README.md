@@ -1,6 +1,6 @@
-# PortGO Authentication, Dashboard, Store & Ranking
+# PortGO Authentication, Dashboard, Store, Ranking & Calendar
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, and a Ranking page with a professional leaderboard experience.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, and a Calendar page for monthly study planning.
 
 ## 📸 Screenshots
 
@@ -12,6 +12,9 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 
 ### Ranking Page
 ![Ranking Page](README-images/ranking-page.png)
+
+### Calendar Page
+![Calendar Page](README-images/calendar-page.png)
 
 ### Login Page
 ![Login Page](README-images/login-page.png)
@@ -43,6 +46,11 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
   - Professional Top 15 leaderboard table
   - Highlighted row for the logged-in user with current position
   - Ranking summary panel with weekly awards and progression tips
+
+- 📅 **Calendar Page**
+  - Monthly grid calendar view
+  - Event-day indicators for quick visualization
+  - Compact monthly event list with date and time
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -129,6 +137,13 @@ f-port-go/
 │               ├── RankingLeftSidebar.tsx
 │               ├── RankingMainContent.tsx
 │               └── RankingRightPanel.tsx
+│       └── Calendar/
+│           ├── index.tsx
+│           └── components/
+│               ├── CalendarContainer.tsx
+│               ├── CalendarLeftSidebar.tsx
+│               ├── CalendarMainContent.tsx
+│               └── CalendarRightPanel.tsx
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -181,6 +196,7 @@ npm run dev
 - `/` - Home dashboard page
 - `/store` - Store page
 - `/ranking` - Ranking page
+- `/calendar` - Calendar page
 
 ### Components
 
@@ -195,10 +211,16 @@ npm run dev
 
 #### Page Components
 
-Each page follows a modular structure:
-- **Container** - Layout wrapper
-- **Form** - Form logic and submission
-- **LeftPanel** - Custom decorative panel for the page
+Pages follow modular structures depending on the section:
+- **Authentication pages** (`/login`, `/register`, `/forgot-password`)
+  - **Container** - Layout wrapper
+  - **Form** - Form logic and submission
+  - **LeftPanel** - Decorative panel for auth branding
+- **App pages** (`/`, `/store`, `/ranking`, `/calendar`)
+  - **Container** - Browser-frame wrapper
+  - **LeftSidebar** - Navigation and profile actions
+  - **MainContent** - Core page content
+  - **RightPanel** - Contextual summary cards and quick info
 
 ## 🎨 Styling
 
