@@ -1,12 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  BrowserHeader,
   LoginLeftPanel,
   LoginForm,
-  DarkModeToggle,
   LoginContainer,
 } from "./components";
+import { BrowserHeader, DarkModeToggle } from "../../components";
 
 function Login() {
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ function Login() {
       
       <div className="min-h-screen flex items-center justify-center p-4 md:p-12">
         <LoginContainer>
-          <BrowserHeader />
+          <BrowserHeader url="portgo.com.br/login" />
           <div className="flex flex-col md:flex-row min-h-[700px]">
             <LoginLeftPanel />
             <LoginForm

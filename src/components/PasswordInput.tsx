@@ -25,15 +25,17 @@ export function PasswordInput({
         required
         className="w-full px-6 py-4 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-2xl focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 focus:border-blue-400 outline-none transition-all dark:text-white text-base placeholder:text-neutral-400"
       />
-      <div className="mt-3 flex justify-end">
-        <button
-          type="button"
-          onClick={onForgotClick}
-          className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 transition-colors"
-        >
-          Esqueceu sua senha?
-        </button>
-      </div>
+      {onForgotClick && (
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={onForgotClick}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 transition-colors"
+          >
+            Esqueceu sua senha?
+          </button>
+        </div>
+      )}
     </div>
   );
 }

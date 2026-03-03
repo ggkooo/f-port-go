@@ -3,8 +3,7 @@ interface LoginFormProps {
   onForgotClick?: () => void;
 }
 
-import { EmailInput } from "./EmailInput";
-import { PasswordInput } from "./PasswordInput";
+import { EmailInput, PasswordInput } from "../../../components";
 import { useNavigate } from "react-router-dom";
 
 export function LoginForm({

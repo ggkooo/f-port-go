@@ -1,11 +1,10 @@
 import React from "react";
 import {
-  BrowserHeader,
   ForgotPasswordLeftPanel,
   ForgotPasswordForm,
-  DarkModeToggle,
   ForgotPasswordContainer,
 } from "./components";
+import { BrowserHeader, DarkModeToggle } from "../../components";
 
 function ForgotPassword() {
   const handleForgotPasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,7 +34,7 @@ function ForgotPassword() {
       
       <div className="min-h-screen flex items-center justify-center p-4 md:p-12">
         <ForgotPasswordContainer>
-          <BrowserHeader />
+          <BrowserHeader url="portgo.com.br/recuperar-senha" />
           <div className="flex flex-col md:flex-row min-h-[700px]">
             <ForgotPasswordLeftPanel />
             <ForgotPasswordForm onSubmit={handleForgotPasswordSubmit} />

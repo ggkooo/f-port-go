@@ -1,4 +1,4 @@
-import { EmailInput } from "./EmailInput";
+import { EmailInput } from "../../../components";
 import { useNavigate } from "react-router-dom";
 
 interface ForgotPasswordFormProps {

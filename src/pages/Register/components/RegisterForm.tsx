@@ -1,6 +1,4 @@
-import { NameInput } from "./NameInput";
-import { EmailInput } from "./EmailInput";
-import { PasswordInput } from "./PasswordInput";
+import { NameInput, EmailInput, PasswordInput } from "../../../components";
 import { useNavigate } from "react-router-dom";
 
 interface RegisterFormProps {
