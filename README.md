@@ -1,6 +1,6 @@
-# PortGO Authentication, Dashboard, Store, Ranking & Calendar
+# PortGO Authentication, Dashboard, Store, Ranking, Calendar & Settings
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, and a Calendar page for monthly study planning.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, and a Settings page for profile and academic information management.
 
 ## 📸 Screenshots
 
@@ -51,6 +51,13 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
   - Monthly grid calendar view
   - Event-day indicators for quick visualization
   - Compact monthly event list with date and time
+
+- ⚙️ **Settings Page**
+  - User profile form with personal and academic fields
+  - Locked name and surname fields
+  - Shift selector (morning, afternoon, full-time)
+  - State and city selectors integrated with IBGE API
+  - City selector enabled only after selecting a valid state
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -144,6 +151,13 @@ f-port-go/
 │               ├── CalendarLeftSidebar.tsx
 │               ├── CalendarMainContent.tsx
 │               └── CalendarRightPanel.tsx
+│       └── Settings/
+│           ├── index.tsx
+│           └── components/
+│               ├── SettingsContainer.tsx
+│               ├── SettingsLeftSidebar.tsx
+│               ├── SettingsMainContent.tsx
+│               └── SettingsRightPanel.tsx
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -197,6 +211,7 @@ npm run dev
 - `/store` - Store page
 - `/ranking` - Ranking page
 - `/calendar` - Calendar page
+- `/settings` - Settings page
 
 ### Components
 
@@ -216,7 +231,7 @@ Pages follow modular structures depending on the section:
   - **Container** - Layout wrapper
   - **Form** - Form logic and submission
   - **LeftPanel** - Decorative panel for auth branding
-- **App pages** (`/`, `/store`, `/ranking`, `/calendar`)
+- **App pages** (`/`, `/store`, `/ranking`, `/calendar`, `/settings`)
   - **Container** - Browser-frame wrapper
   - **LeftSidebar** - Navigation and profile actions
   - **MainContent** - Core page content
