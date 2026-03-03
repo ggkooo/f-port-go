@@ -1,6 +1,6 @@
-# PortGO Authentication, Dashboard, Store, Ranking, Calendar & Settings
+# PortGO Authentication, Dashboard, Store, Ranking, Calendar, Questionnaire & Settings
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, and a Settings page for profile and academic information management.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, a full Questionnaire flow (grade selection, difficulty selection, quiz and review rounds), and a Settings page for profile and academic information management.
 
 ## 📸 Screenshots
 
@@ -24,6 +24,24 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 
 ### Forgot Password Page
 ![Forgot Password Page](README-images/forgot-password-page.png)
+
+### Settings Page
+![Settings Page](README-images/settings-page.png)
+
+### Questionnaire - Step 1 (Grade Selection)
+![Questionnaire Step 1](README-images/questionnaire-001.png)
+
+### Questionnaire - Step 2 (Difficulty Selection)
+![Questionnaire Step 2](README-images/questionnaire-002.png)
+
+### Questionnaire - Step 3 (Ready State)
+![Questionnaire Step 3](README-images/questionnaire-003.png)
+
+### Questionnaire - Quiz Running
+![Questionnaire Quiz](README-images/questionnaire-004.png)
+
+### Questionnaire - Completed Lesson
+![Questionnaire Completed](README-images/questionnaire-005.png)
 
 ## ✨ Features
 
@@ -58,6 +76,20 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
   - Shift selector (morning, afternoon, full-time)
   - State and city selectors integrated with IBGE API
   - City selector enabled only after selecting a valid state
+
+- 🧠 **Questionnaire Flow**
+  - Activity-based entry from Home modules (Grammar and Reading)
+  - Grade selection with recommended badge
+  - Difficulty selection (easy, medium, hard)
+  - Lesson XP reward by selected difficulty
+  - 10 questions per lesson
+  - Immediate feedback for correct/incorrect answers
+  - Mandatory review rounds for wrong answers until all are correct
+  - Help tools available once per lesson:
+    - DICA
+    - REMOVER 2 ALTERNATIVAS
+    - PULAR QUESTÃO
+  - Consecutive correct-answer streak tracking
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -158,6 +190,19 @@ f-port-go/
 │               ├── SettingsLeftSidebar.tsx
 │               ├── SettingsMainContent.tsx
 │               └── SettingsRightPanel.tsx
+│       └── Questionnaire/
+│           ├── index.tsx
+│           ├── data.ts
+│           ├── types.ts
+│           └── components/
+│               ├── DifficultySelectionStep.tsx
+│               ├── FinishedStep.tsx
+│               ├── GradeSelectionStep.tsx
+│               ├── QuestionnaireRightPanel.tsx
+│               ├── QuizStep.tsx
+│               ├── ReadyStep.tsx
+│               ├── StepIndicator.tsx
+│               └── index.ts
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -211,6 +256,7 @@ npm run dev
 - `/store` - Store page
 - `/ranking` - Ranking page
 - `/calendar` - Calendar page
+- `/questionnaire` - Questionnaire page
 - `/settings` - Settings page
 
 ### Components
@@ -231,7 +277,7 @@ Pages follow modular structures depending on the section:
   - **Container** - Layout wrapper
   - **Form** - Form logic and submission
   - **LeftPanel** - Decorative panel for auth branding
-- **App pages** (`/`, `/store`, `/ranking`, `/calendar`, `/settings`)
+- **App pages** (`/`, `/store`, `/ranking`, `/calendar`, `/questionnaire`, `/settings`)
   - **Container** - Browser-frame wrapper
   - **LeftSidebar** - Navigation and profile actions
   - **MainContent** - Core page content

@@ -7,6 +7,7 @@ import Store from './pages/Store'
 import Ranking from './pages/Ranking'
 import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
+import Questionnaire from './pages/Questionnaire'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/ranking" element={<Ranking />} />
       <Route path="/calendar" element={<Calendar />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/questionnaire" element={<Questionnaire />} />
       <Route path="/" element={<Home />} />
     </Routes>
   )
