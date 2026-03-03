@@ -7,6 +7,9 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 ### Home Page
 ![Home Page](README-images/home-page.png)
 
+### Home Page (Mobile)
+![Home Page Mobile](README-images/phone-home-page.png)
+
 ### Store Page
 ![Store Page](README-images/store-page.png)
 
