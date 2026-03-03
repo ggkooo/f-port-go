@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 const navItems = [
   { icon: "home", active: true, path: "/" },
   { icon: "shopping_basket", active: false, hasNotification: true, path: "/store" },
-  { icon: "leaderboard", active: false },
+  { icon: "leaderboard", active: false, path: "/ranking" },
   { icon: "calendar_today", active: false },
 ];
 
