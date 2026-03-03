@@ -1,11 +1,15 @@
+import { useNavigate } from "react-router-dom";
+
 const navItems = [
-  { icon: "home", active: true },
-  { icon: "shopping_basket", active: false, hasNotification: true },
+  { icon: "home", active: true, path: "/" },
+  { icon: "shopping_basket", active: false, hasNotification: true, path: "/store" },
   { icon: "leaderboard", active: false },
   { icon: "calendar_today", active: false },
 ];
 
 export function HomeLeftSidebar() {
+  const navigate = useNavigate();
+
   return (
     <aside className="w-24 bg-neutral-100 dark:bg-neutral-800 m-3 rounded-[2rem] flex-col items-center py-6 gap-5 hidden lg:flex">
       <div className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 p-3 rounded-2xl mb-4">
@@ -13,10 +17,15 @@ export function HomeLeftSidebar() {
       </div>
 
       <nav className="flex flex-col gap-4 flex-1">
-        {navItems.map(({ icon, active, hasNotification }) => (
+        {navItems.map(({ icon, active, hasNotification, path }) => (
           <button
             key={icon}
             type="button"
+            onClick={() => {
+              if (path) {
+                navigate(path);
+              }
+            }}
             className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm relative transition-colors ${
               active
                 ? "bg-neutral-900 dark:bg-blue-500 text-white"
