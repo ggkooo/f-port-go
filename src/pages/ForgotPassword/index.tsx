@@ -32,7 +32,7 @@ function ForgotPassword() {
       
       <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
         <PageContainer size="compact">
-          <BrowserHeader url="portgo.com.br/recuperar-senha" />
+          <BrowserHeader />
           <div className="flex flex-1 min-h-0 flex-col md:flex-row">
             <LeftPanel
               title="Recupere sua"
