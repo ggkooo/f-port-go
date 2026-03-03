@@ -70,8 +70,8 @@ export function LeftPanel({
         </div>
       )}
 
-      <div className="absolute top-[20%] right-[-10%] w-64 h-64 bg-white/30 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-[-5%] left-[-5%] w-80 h-80 bg-blue-200/40 rounded-full blur-3xl"></div>
+      <div className="absolute top-[20%] right-[-10%] w-64 h-64 bg-white/30 dark:bg-white/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-[-5%] left-[-5%] w-80 h-80 bg-blue-200/40 dark:bg-blue-500/10 rounded-full blur-3xl"></div>
     </div>
   );
 }

@@ -16,12 +16,12 @@ export function GradeSelectionStep({ grades, recommendedGrade, onSelectGrade }: 
             key={grade}
             type="button"
             onClick={() => onSelectGrade(grade)}
-            className="p-4 rounded-2xl bg-[#D4EAFC] hover:brightness-95 transition-all text-left"
+            className="p-4 rounded-2xl bg-[#D4EAFC] dark:bg-blue-900/30 hover:brightness-95 transition-all text-left"
           >
             <div className="flex items-start justify-between gap-2">
-              <p className="font-bold text-blue-900">{grade}</p>
+              <p className="font-bold text-blue-900 dark:text-blue-100">{grade}</p>
               {grade === recommendedGrade && (
-                <span className="text-[10px] font-extrabold px-2 py-1 rounded-full bg-white/80 text-blue-700">
+                <span className="text-[10px] font-extrabold px-2 py-1 rounded-full bg-white/80 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200">
                   RECOMENDADO
                 </span>
               )}

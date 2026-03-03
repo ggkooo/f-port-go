@@ -93,8 +93,8 @@ export function QuizStep({
         <div
           className={`mb-4 rounded-2xl p-4 border ${
             lastAnswerResult === "wrong"
-              ? "bg-[#FDE68A] border-amber-300 text-amber-900"
-              : "bg-[#A3E4A1]/60 border-emerald-300 text-emerald-900"
+              ? "bg-[#FDE68A] dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100"
+              : "bg-[#A3E4A1]/60 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-100"
           }`}
         >
           {lastAnswerResult === "wrong"
@@ -104,7 +104,7 @@ export function QuizStep({
       )}
 
       {helpMessage && (
-        <div className="mb-4 rounded-2xl p-4 border bg-[#D4EAFC] border-blue-300 text-blue-900">
+        <div className="mb-4 rounded-2xl p-4 border bg-[#D4EAFC] dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100">
           {helpMessage}
         </div>
       )}
@@ -128,7 +128,7 @@ export function QuizStep({
                 <span className={`material-symbols-outlined ${action.iconClass}`}>{action.icon}</span>
                 <div className="flex flex-col">
                   <span className={`text-xs font-extrabold ${action.textClass}`}>{action.title}</span>
-                  <span className="text-[10px] font-bold text-neutral-600">{isUsed ? "USADO" : "1/1"}</span>
+                  <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">{isUsed ? "USADO" : "1/1"}</span>
                 </div>
               </button>
             );

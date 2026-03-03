@@ -2,23 +2,23 @@ const quickActions = [
   {
     title: "Ver Dica",
     icon: "lightbulb",
-    containerClass: "bg-[#D4EAFC]",
-    iconClass: "text-blue-600",
-    textClass: "text-blue-900",
+    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
+    iconClass: "text-blue-600 dark:text-blue-200",
+    textClass: "text-blue-900 dark:text-blue-100",
   },
   {
     title: "Remover 3 Alternativas",
     icon: "filter_3",
-    containerClass: "bg-[#E9F3FF]",
-    iconClass: "text-blue-600",
-    textClass: "text-blue-900",
+    containerClass: "bg-[#E9F3FF] dark:bg-blue-900/20",
+    iconClass: "text-blue-600 dark:text-blue-200",
+    textClass: "text-blue-900 dark:text-blue-100",
   },
   {
     title: "Pular Questão",
     icon: "double_arrow",
-    containerClass: "bg-[#A3E4A1]/70",
-    iconClass: "text-emerald-600",
-    textClass: "text-emerald-900",
+    containerClass: "bg-[#A3E4A1]/70 dark:bg-emerald-900/30",
+    iconClass: "text-emerald-600 dark:text-emerald-200",
+    textClass: "text-emerald-900 dark:text-emerald-100",
   },
 ];
 
@@ -88,10 +88,10 @@ export function HomeRightPanel() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] font-bold text-neutral-400 uppercase">
+                  <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-300 uppercase">
                     {achievement.category}
                   </span>
-                  <span className="text-[10px] font-bold text-neutral-400 flex items-center gap-0.5">
+                  <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-300 flex items-center gap-0.5">
                     <span className="material-symbols-outlined text-[10px]">star</span>
                     {achievement.rating}
                   </span>

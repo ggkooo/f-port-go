@@ -35,7 +35,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] text-blue-900 font-extrabold py-4 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-3 group"
+            className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] dark:bg-blue-500 dark:hover:bg-blue-400 text-blue-900 dark:text-white font-extrabold py-4 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-3 group"
           >
             <span className="text-lg">Criar Conta</span>
             <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1.5">
