@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Store from './pages/Store'
 import Ranking from './pages/Ranking'
 import Calendar from './pages/Calendar'
+import Settings from './pages/Settings'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/store" element={<Store />} />
       <Route path="/ranking" element={<Ranking />} />
       <Route path="/calendar" element={<Calendar />} />
+      <Route path="/settings" element={<Settings />} />
       <Route path="/" element={<Home />} />
     </Routes>
   )
