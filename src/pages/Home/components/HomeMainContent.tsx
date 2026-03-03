@@ -1,5 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 const studyModules = [
   {
+    key: "grammar",
     title: "Gramática",
     icon: "text_fields",
     containerClass: "bg-[#D4EAFC]",
@@ -7,6 +10,7 @@ const studyModules = [
     textClass: "text-blue-900",
   },
   {
+    key: "reading",
     title: "Interpretação Textual",
     icon: "auto_stories",
     containerClass: "bg-[#A3E4A1]/60",
@@ -49,6 +53,8 @@ const dailyChallenges = [
 ];
 
 export function HomeMainContent() {
+  const navigate = useNavigate();
+
   return (
     <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8">
       <header className="mb-6">
@@ -80,6 +86,7 @@ export function HomeMainContent() {
           <button
             key={module.title}
             type="button"
+            onClick={() => navigate(`/questionnaire?activity=${module.key}`)}
             className={`${module.containerClass} p-4 md:p-5 rounded-2xl md:rounded-large flex flex-col justify-between min-h-[130px] md:min-h-[150px] hover:opacity-90 transition-all text-left md:col-start-1 ${
               index === 0 ? "md:row-start-1" : "md:row-start-2"
             }`}
