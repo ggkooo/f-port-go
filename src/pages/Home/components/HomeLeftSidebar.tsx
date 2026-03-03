@@ -43,6 +43,7 @@ export function HomeLeftSidebar() {
       <div className="flex flex-col gap-4 mt-auto">
         <button
           type="button"
+          onClick={() => navigate("/settings")}
           className="w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-neutral-500 shadow-sm"
         >
           <span className="material-symbols-outlined">settings</span>
