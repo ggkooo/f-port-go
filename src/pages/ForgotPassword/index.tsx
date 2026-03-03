@@ -1,23 +1,16 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   BrowserHeader,
-  LoginLeftPanel,
-  LoginForm,
+  ForgotPasswordLeftPanel,
+  ForgotPasswordForm,
   DarkModeToggle,
-  LoginContainer,
+  ForgotPasswordContainer,
 } from "./components";
 
-function Login() {
-  const navigate = useNavigate();
-
-  const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+function ForgotPassword() {
+  const handleForgotPasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("Form submitted", e);
-    // TODO: Implementar lógica de login
-  };
-
-  const handleForgotPassword = () => {
-    navigate("/forgot-password");
+    // TODO: Implementar lógica de recuperação de senha
   };
 
   return (
@@ -41,20 +34,18 @@ function Login() {
       `}</style>
       
       <div className="min-h-screen flex items-center justify-center p-4 md:p-12">
-        <LoginContainer>
+        <ForgotPasswordContainer>
           <BrowserHeader />
           <div className="flex flex-col md:flex-row min-h-[700px]">
-            <LoginLeftPanel />
-            <LoginForm
-              onSubmit={handleLoginSubmit}
-              onForgotClick={handleForgotPassword}
-            />
+            <ForgotPasswordLeftPanel />
+            <ForgotPasswordForm onSubmit={handleForgotPasswordSubmit} />
           </div>
-        </LoginContainer>
-        <DarkModeToggle />
+        </ForgotPasswordContainer>
       </div>
+
+      <DarkModeToggle />
     </>
   );
 }
 
-export default Login;
+export default ForgotPassword;
