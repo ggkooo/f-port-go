@@ -56,7 +56,7 @@ export function RankingMainContent() {
   const gapToTop15 = topPlayers[topPlayers.length - 1].xp - loggedUser.xp;
 
   return (
-    <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 overflow-y-auto">
+    <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white mb-4 leading-tight">
           Ranking Geral
@@ -65,8 +65,8 @@ export function RankingMainContent() {
         <div className="bg-white dark:bg-neutral-800 p-5 md:p-6 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#D4EAFC] flex items-center justify-center">
-                <span className="material-symbols-outlined text-blue-700">leaderboard</span>
+              <div className="w-10 h-10 rounded-full bg-[#D4EAFC] dark:bg-blue-900/30 flex items-center justify-center">
+                <span className="material-symbols-outlined text-blue-700 dark:text-blue-200">leaderboard</span>
               </div>
               <div>
                 <h3 className="font-bold text-neutral-900 dark:text-white">Disputa semanal ativa</h3>
@@ -120,12 +120,12 @@ export function RankingMainContent() {
                 </td>
               </tr>
 
-              <tr className="bg-[#D4EAFC] dark:bg-neutral-700">
-                <td className="px-4 py-4 rounded-l-2xl font-extrabold text-blue-900 dark:text-white">#{loggedUser.position}</td>
-                <td className="px-4 py-4 font-extrabold text-blue-900 dark:text-white">{loggedUser.name} (usuário logado)</td>
-                <td className="px-4 py-4 text-blue-800 dark:text-neutral-200">{loggedUser.streak} dias</td>
-                <td className="px-4 py-4 text-blue-900 dark:text-white font-extrabold">{formatXp(loggedUser.xp)}</td>
-                <td className="px-4 py-4 rounded-r-2xl text-blue-800 dark:text-neutral-100 font-bold">
+              <tr className="bg-[#D4EAFC] dark:bg-blue-900/30">
+                <td className="px-4 py-4 rounded-l-2xl font-extrabold text-blue-900 dark:text-blue-100">#{loggedUser.position}</td>
+                <td className="px-4 py-4 font-extrabold text-blue-900 dark:text-blue-100">{loggedUser.name} (usuário logado)</td>
+                <td className="px-4 py-4 text-blue-800 dark:text-blue-200">{loggedUser.streak} dias</td>
+                <td className="px-4 py-4 text-blue-900 dark:text-blue-100 font-extrabold">{formatXp(loggedUser.xp)}</td>
+                <td className="px-4 py-4 rounded-r-2xl text-blue-800 dark:text-blue-200 font-bold">
                   {loggedUser.weeklyGain}
                 </td>
               </tr>

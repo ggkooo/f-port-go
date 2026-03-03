@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AppLeftSidebar, BrowserHeader, DarkModeToggle, PageContainer } from "../../components";
+import { AppLeftSidebar, BrowserHeader, PageContainer } from "../../components";
 import {
   ACTIVITY_LABELS,
   DIFFICULTY_OPTIONS,
@@ -223,15 +223,15 @@ function Questionnaire() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
+    <div className="h-screen w-screen overflow-hidden flex items-center justify-center px-0 pt-0 pb-0 sm:px-2 sm:pt-2 sm:pb-0 md:px-4 md:pt-4 md:pb-0 lg:p-4">
       <PageContainer>
         <BrowserHeader />
 
         <div className="flex flex-1 min-h-0 bg-[#F0F4F8] dark:bg-neutral-950 overflow-hidden">
           <AppLeftSidebar />
 
-          <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 flex flex-col overflow-hidden">
-            <header className="mb-6 flex items-center justify-between gap-4">
+          <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 flex flex-col overflow-hidden">
+            <header className="mb-6 flex items-start sm:items-center justify-between gap-4 flex-wrap">
               <div>
                 <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white mb-2 leading-tight">
                   Preparação do Questionário
@@ -337,8 +337,6 @@ function Questionnaire() {
           />
         </div>
       </PageContainer>
-
-      <DarkModeToggle />
     </div>
   );
 }

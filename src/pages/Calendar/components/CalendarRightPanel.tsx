@@ -32,11 +32,11 @@ export function CalendarRightPanel() {
         ))}
       </div>
 
-      <div className="bg-[#FDE68A] dark:bg-neutral-700 rounded-2xl p-4">
-        <h3 className="text-sm font-bold text-amber-900 dark:text-white mb-2">Lembretes úteis</h3>
+      <div className="bg-[#FDE68A] dark:bg-amber-900/30 rounded-2xl p-4">
+        <h3 className="text-sm font-bold text-amber-900 dark:text-amber-100 mb-2">Lembretes úteis</h3>
         <ul className="space-y-2">
           {reminders.map((reminder) => (
-            <li key={reminder} className="text-xs text-amber-800 dark:text-neutral-200 leading-relaxed">
+            <li key={reminder} className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
               {reminder}
             </li>
           ))}

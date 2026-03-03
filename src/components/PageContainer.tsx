@@ -10,7 +10,7 @@ export function PageContainer({ children, size = "default" }: PageContainerProps
 
   return (
     <div
-      className={`w-full ${widthClass} h-full bg-white dark:bg-neutral-900 rounded-large overflow-hidden flex flex-col browser-frame border border-neutral-200 dark:border-neutral-800`}
+      className={`w-full ${widthClass} h-full bg-white dark:bg-neutral-900 rounded-none sm:rounded-large overflow-hidden flex flex-col browser-frame border border-transparent sm:border-neutral-200 dark:sm:border-neutral-800`}
     >
       {children}
     </div>

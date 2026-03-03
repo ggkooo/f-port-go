@@ -80,12 +80,12 @@ export function QuestionnaireRightPanel({
                 isDisabled ? "opacity-60 cursor-not-allowed" : "hover:brightness-95"
               }`}
             >
-              <div className="bg-white/50 p-3 rounded-2xl">
+              <div className="bg-white/50 dark:bg-neutral-900/30 p-3 rounded-2xl">
                 <span className={`material-symbols-outlined ${action.iconClass}`}>{action.icon}</span>
               </div>
               <div className="flex flex-col">
                 <span className={`font-bold ${action.textClass}`}>{action.title}</span>
-                <span className="text-[11px] font-bold text-neutral-600">{isUsed ? "USADO" : "1/1 DISPONÍVEL"}</span>
+                <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-300">{isUsed ? "USADO" : "1/1 DISPONÍVEL"}</span>
               </div>
             </button>
           );

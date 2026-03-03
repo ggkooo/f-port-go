@@ -88,7 +88,7 @@ export function SettingsMainContent() {
   }, [isStateValid, selectedState]);
 
   return (
-    <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 overflow-y-auto">
+    <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white mb-2 leading-tight">
           Configurações do Perfil
@@ -101,8 +101,8 @@ export function SettingsMainContent() {
       <form className="bg-white dark:bg-neutral-800 p-5 md:p-6 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700">
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-[#D4EAFC] flex items-center justify-center">
-              <span className="material-symbols-outlined text-blue-700">person</span>
+            <div className="w-10 h-10 rounded-full bg-[#D4EAFC] dark:bg-blue-900/30 flex items-center justify-center">
+              <span className="material-symbols-outlined text-blue-700 dark:text-blue-200">person</span>
             </div>
             <div>
               <h2 className="font-bold text-neutral-900 dark:text-white">Informações pessoais</h2>
@@ -130,8 +130,8 @@ export function SettingsMainContent() {
 
         <section className="mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-[#A3E4A1]/70 flex items-center justify-center">
-              <span className="material-symbols-outlined text-emerald-700">school</span>
+            <div className="w-10 h-10 rounded-full bg-[#A3E4A1]/70 dark:bg-emerald-900/30 flex items-center justify-center">
+              <span className="material-symbols-outlined text-emerald-700 dark:text-emerald-200">school</span>
             </div>
             <div>
               <h2 className="font-bold text-neutral-900 dark:text-white">Informações acadêmicas</h2>

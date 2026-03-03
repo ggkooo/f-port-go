@@ -38,11 +38,11 @@ export function SettingsRightPanel() {
         </ul>
       </div>
 
-      <div className="bg-[#D4EAFC] dark:bg-neutral-700 rounded-2xl p-4">
-        <h3 className="font-bold text-blue-900 dark:text-white mb-3">Sugestões rápidas</h3>
+      <div className="bg-[#D4EAFC] dark:bg-blue-900/30 rounded-2xl p-4">
+        <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-3">Sugestões rápidas</h3>
         <ul className="space-y-3">
           {suggestions.map((suggestion) => (
-            <li key={suggestion} className="text-sm text-blue-800 dark:text-neutral-200 leading-relaxed">
+            <li key={suggestion} className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
               • {suggestion}
             </li>
           ))}
