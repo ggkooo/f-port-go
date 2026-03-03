@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BrowserHeader,
   LoginLeftPanel,
@@ -8,14 +9,15 @@ import {
 } from "./components";
 
 function Login() {
+  const navigate = useNavigate();
+
   const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("Form submitted", e);
     // TODO: Implementar lógica de login
   };
 
   const handleForgotPassword = () => {
-    console.log("Forgot password clicked");
-    // TODO: Implementar redirecionamento para página de recuperação de senha
+    navigate("/forgot-password");
   };
 
   return (
