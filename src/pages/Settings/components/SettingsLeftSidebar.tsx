@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { icon: "home", active: false, path: "/" },
-  { icon: "shopping_basket", active: true, path: "/store" },
+  { icon: "shopping_basket", active: false, path: "/store" },
   { icon: "leaderboard", active: false, path: "/ranking" },
   { icon: "calendar_today", active: false, path: "/calendar" },
 ];
 
-export function StoreLeftSidebar() {
+export function SettingsLeftSidebar() {
   const navigate = useNavigate();
 
   return (
@@ -41,7 +41,7 @@ export function StoreLeftSidebar() {
         <button
           type="button"
           onClick={() => navigate("/settings")}
-          className="w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-neutral-500 shadow-sm"
+          className="w-12 h-12 rounded-full bg-neutral-900 dark:bg-blue-500 text-white flex items-center justify-center shadow-sm"
         >
           <span className="material-symbols-outlined">settings</span>
         </button>
