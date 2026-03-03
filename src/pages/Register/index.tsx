@@ -1,21 +1,16 @@
 import React from "react";
 import {
   BrowserHeader,
-  LoginLeftPanel,
-  LoginForm,
+  RegisterLeftPanel,
+  RegisterForm,
   DarkModeToggle,
-  LoginContainer,
+  RegisterContainer,
 } from "./components";
 
-function Login() {
-  const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+function Register() {
+  const handleRegisterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("Form submitted", e);
-    // TODO: Implementar lógica de login
-  };
-
-  const handleForgotPassword = () => {
-    console.log("Forgot password clicked");
-    // TODO: Implementar redirecionamento para página de recuperação de senha
+    // TODO: Implementar lógica de registro
   };
 
   return (
@@ -39,20 +34,19 @@ function Login() {
       `}</style>
       
       <div className="min-h-screen flex items-center justify-center p-4 md:p-12">
-        <LoginContainer>
+        <RegisterContainer>
           <BrowserHeader />
           <div className="flex flex-col md:flex-row min-h-[700px]">
-            <LoginLeftPanel />
-            <LoginForm
-              onSubmit={handleLoginSubmit}
-              onForgotClick={handleForgotPassword}
+            <RegisterLeftPanel />
+            <RegisterForm
+              onSubmit={handleRegisterSubmit}
             />
           </div>
-        </LoginContainer>
+        </RegisterContainer>
         <DarkModeToggle />
       </div>
     </>
   );
 }
 
-export default Login;
+export default Register;
