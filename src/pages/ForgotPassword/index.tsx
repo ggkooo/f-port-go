@@ -32,10 +32,10 @@ function ForgotPassword() {
         }
       `}</style>
       
-      <div className="min-h-screen flex items-center justify-center p-4 md:p-12">
+      <div className="h-screen w-screen overflow-hidden flex items-center justify-center p-2 md:p-4">
         <ForgotPasswordContainer>
           <BrowserHeader url="portgo.com.br/recuperar-senha" />
-          <div className="flex flex-col md:flex-row min-h-[700px]">
+          <div className="flex flex-1 min-h-0 flex-col md:flex-row">
             <ForgotPasswordLeftPanel />
             <ForgotPasswordForm onSubmit={handleForgotPasswordSubmit} />
           </div>
