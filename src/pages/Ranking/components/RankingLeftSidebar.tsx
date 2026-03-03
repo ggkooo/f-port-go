@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { icon: "home", active: false, path: "/" },
-  { icon: "shopping_basket", active: true, path: "/store" },
-  { icon: "leaderboard", active: false, path: "/ranking" },
+  { icon: "shopping_basket", active: false, path: "/store" },
+  { icon: "leaderboard", active: true, path: "/ranking" },
   { icon: "calendar_today", active: false },
 ];
 
-export function StoreLeftSidebar() {
+export function RankingLeftSidebar() {
   const navigate = useNavigate();
 
   return (

@@ -1,6 +1,6 @@
-# PortGO Authentication, Dashboard & Store
+# PortGO Authentication, Dashboard, Store & Ranking
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, and a Store page for XP boosts and streak protection items.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, and a Ranking page with a professional leaderboard experience.
 
 ## 📸 Screenshots
 
@@ -9,6 +9,9 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 
 ### Store Page
 ![Store Page](README-images/store-page.png)
+
+### Ranking Page
+![Ranking Page](README-images/ranking-page.png)
 
 ### Login Page
 ![Login Page](README-images/login-page.png)
@@ -35,6 +38,11 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
   - XP potion cards (1.5x, 2x, 2.5x, and 3x)
   - Streak Freeze (Gelinho da Ofensiva) item to protect the streak for one missed day
   - Purchase-focused layout with item highlights, price tags, and quick info panel
+
+- 🏆 **Ranking Page**
+  - Professional Top 15 leaderboard table
+  - Highlighted row for the logged-in user with current position
+  - Ranking summary panel with weekly awards and progression tips
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -114,6 +122,13 @@ f-port-go/
 │               ├── StoreLeftSidebar.tsx
 │               ├── StoreMainContent.tsx
 │               └── StoreRightPanel.tsx
+│       └── Ranking/
+│           ├── index.tsx
+│           └── components/
+│               ├── RankingContainer.tsx
+│               ├── RankingLeftSidebar.tsx
+│               ├── RankingMainContent.tsx
+│               └── RankingRightPanel.tsx
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -165,6 +180,7 @@ npm run dev
 - `/forgot-password` - Password recovery page
 - `/` - Home dashboard page
 - `/store` - Store page
+- `/ranking` - Ranking page
 
 ### Components
 
