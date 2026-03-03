@@ -1,11 +1,14 @@
-# PortGO Authentication & Learning Dashboard
+# PortGO Authentication, Dashboard & Store
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project now includes both a complete authentication flow (login, registration, and password recovery) and a Home learning dashboard with study modules, streak tracking, and daily challenges.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, and a Store page for XP boosts and streak protection items.
 
 ## 📸 Screenshots
 
 ### Home Page
 ![Home Page](README-images/home-page.png)
+
+### Store Page
+![Store Page](README-images/store-page.png)
 
 ### Login Page
 ![Login Page](README-images/login-page.png)
@@ -27,6 +30,11 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
   - Study modules overview
   - Current streak highlight
   - Daily challenges with progress bars and XP badges
+
+- 🛍️ **Store Page**
+  - XP potion cards (1.5x, 2x, 2.5x, and 3x)
+  - Streak Freeze (Gelinho da Ofensiva) item to protect the streak for one missed day
+  - Purchase-focused layout with item highlights, price tags, and quick info panel
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -99,6 +107,13 @@ f-port-go/
 │               ├── HomeLeftSidebar.tsx
 │               ├── HomeMainContent.tsx
 │               └── HomeRightPanel.tsx
+│       └── Store/
+│           ├── index.tsx
+│           └── components/
+│               ├── StoreContainer.tsx
+│               ├── StoreLeftSidebar.tsx
+│               ├── StoreMainContent.tsx
+│               └── StoreRightPanel.tsx
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -149,6 +164,7 @@ npm run dev
 - `/register` - Registration page
 - `/forgot-password` - Password recovery page
 - `/` - Home dashboard page
+- `/store` - Store page
 
 ### Components
 

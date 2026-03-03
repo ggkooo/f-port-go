@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { icon: "home", active: true, path: "/" },
-  { icon: "shopping_basket", active: false, hasNotification: true, path: "/store" },
+  { icon: "home", active: false, path: "/" },
+  { icon: "shopping_basket", active: true, path: "/store" },
   { icon: "leaderboard", active: false },
   { icon: "calendar_today", active: false },
 ];
 
-export function HomeLeftSidebar() {
+export function StoreLeftSidebar() {
   const navigate = useNavigate();
 
   return (
@@ -17,7 +17,7 @@ export function HomeLeftSidebar() {
       </div>
 
       <nav className="flex flex-col gap-4 flex-1">
-        {navItems.map(({ icon, active, hasNotification, path }) => (
+        {navItems.map(({ icon, active, path }) => (
           <button
             key={icon}
             type="button"
@@ -33,9 +33,6 @@ export function HomeLeftSidebar() {
             }`}
           >
             <span className="material-symbols-outlined">{icon}</span>
-            {hasNotification && (
-              <div className="absolute top-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-neutral-100 dark:border-neutral-800" />
-            )}
           </button>
         ))}
       </nav>
