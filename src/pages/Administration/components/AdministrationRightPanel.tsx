@@ -1,8 +1,5 @@
-const summaryCards = [
-  { label: "Questões cadastradas", value: "248" },
-  { label: "Alunos ativos", value: "126" },
-  { label: "Desafios em execução", value: "8" },
-];
+import { useEffect, useState } from "react";
+import { getOverviewStatistics, type OverviewStatistics } from "../../../services/overviewService";
 
 const quickActions = [
   "Revisar questões pendentes de validação.",
@@ -11,6 +8,41 @@ const quickActions = [
 ];
 
 export function AdministrationRightPanel() {
+  const [statistics, setStatistics] = useState<OverviewStatistics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await getOverviewStatistics();
+        setStatistics(data);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Não foi possível carregar as estatísticas.";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
+  const summaryCards = statistics
+    ? [
+        { label: "Questões cadastradas", value: String(statistics.total_questions) },
+        { label: "Alunos ativos", value: String(statistics.total_users) },
+        { label: "Desafios em execução", value: String(statistics.total_challenges) },
+      ]
+    : [
+        { label: "Questões cadastradas", value: "-" },
+        { label: "Alunos ativos", value: "-" },
+        { label: "Desafios em execução", value: "-" },
+      ];
+
   return (
     <aside className="w-80 bg-neutral-100 dark:bg-neutral-800 m-3 rounded-[2rem] p-5 flex-col gap-5 hidden 2xl:flex">
       <div className="flex items-center justify-between mb-2">
@@ -28,14 +60,24 @@ export function AdministrationRightPanel() {
           Resumo geral
         </h2>
 
-        <ul className="space-y-3">
-          {summaryCards.map((item) => (
-            <li key={item.label} className="flex items-center justify-between text-sm">
-              <span className="text-neutral-700 dark:text-neutral-200">{item.label}</span>
-              <span className="font-bold text-neutral-900 dark:text-white">{item.value}</span>
-            </li>
-          ))}
-        </ul>
+        {loading && (
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">Carregando...</p>
+        )}
+
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        )}
+
+        {!loading && !error && (
+          <ul className="space-y-3">
+            {summaryCards.map((item) => (
+              <li key={item.label} className="flex items-center justify-between text-sm">
+                <span className="text-neutral-700 dark:text-neutral-200">{item.label}</span>
+                <span className="font-bold text-neutral-900 dark:text-white">{item.value}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="bg-[#D4EAFC] dark:bg-blue-900/30 rounded-2xl p-4">
