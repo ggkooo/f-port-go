@@ -3,6 +3,7 @@ export type UserSession = {
   email: string;
   firstName?: string;
   token: string;
+  isAdmin: boolean;
   profileCompleted: boolean;
 };
 
