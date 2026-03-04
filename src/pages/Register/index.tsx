@@ -4,7 +4,7 @@ import {
   RegisterForm,
 } from "./components";
 import { BrowserHeader, DarkModeToggle, LeftPanel, PageContainer } from "../../components";
-import { register } from "../../services/auth";
+import { register } from "../../services/authService";
 function Register() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
