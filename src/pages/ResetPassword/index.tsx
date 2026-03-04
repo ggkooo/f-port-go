@@ -7,7 +7,7 @@ import {
   LeftPanel,
   PageContainer,
 } from "../../components";
-import { resetPassword } from "../../services/auth";
+import { resetPassword } from "../../services/authService";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
