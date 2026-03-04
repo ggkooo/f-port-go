@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { DarkModeToggle } from "./DarkModeToggle";
+import { clearSession } from "../services/session";
 
 type AppRoute = "/" | "/store" | "/ranking" | "/calendar" | "/settings";
 
@@ -17,6 +18,11 @@ const navItems: Array<{ icon: string; path: AppRoute }> = [
 
 export function AppLeftSidebar({ activePath, showStoreNotification = false }: AppLeftSidebarProps) {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearSession();
+    navigate("/login");
+  };
 
   return (
     <>
@@ -59,6 +65,15 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
             className="w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-neutral-500 shadow-sm"
           >
             <span className="material-symbols-outlined">settings</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            title="Logout"
+          >
+            <span className="material-symbols-outlined">logout</span>
           </button>
 
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white dark:border-neutral-700">
@@ -106,6 +121,15 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
             }`}
           >
             <span className="material-symbols-outlined text-[20px]">settings</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+            title="Logout"
+          >
+            <span className="material-symbols-outlined text-[20px]">logout</span>
           </button>
 
           <DarkModeToggle placement="mobile-nav" />
