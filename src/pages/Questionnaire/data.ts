@@ -1,4 +1,11 @@
-import type { ActivityKey, DifficultyOption, HelpAction, OptionStyle, QuizQuestion } from "./types";
+import type { ActivityKey, DifficultyOption, HelpAction, OptionStyle } from "./types";
+
+interface LegacyQuizQuestion {
+  id: number;
+  statement: string;
+  options: string[];
+  correctOptionIndex: number;
+}
 
 export const ACTIVITY_LABELS: Record<ActivityKey, string> = {
   grammar: "Gramática",
@@ -8,34 +15,39 @@ export const ACTIVITY_LABELS: Record<ActivityKey, string> = {
 export const GRADE_OPTIONS = ["6º Ano", "7º Ano", "8º Ano", "9º Ano", "1º Ano EM", "2º Ano EM", "3º Ano EM"];
 export const RECOMMENDED_GRADE = "3º Ano EM";
 
-export const DIFFICULTY_OPTIONS: DifficultyOption[] = [
-  {
-    key: "easy",
-    label: "Fácil",
+const DIFFICULTY_META_BY_NAME: Record<string, Omit<DifficultyOption, "key" | "label">> = {
+  "fácil": {
     xp: 15,
     containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
     textClass: "text-blue-900 dark:text-blue-100",
     badgeClass: "text-blue-700 dark:text-blue-200",
   },
-  {
-    key: "medium",
-    label: "Médio",
+  "médio": {
     xp: 25,
     containerClass: "bg-[#FDE68A] dark:bg-amber-900/30",
     textClass: "text-amber-900 dark:text-amber-100",
     badgeClass: "text-amber-700 dark:text-amber-200",
   },
-  {
-    key: "hard",
-    label: "Difícil",
+  "difícil": {
     xp: 40,
     containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
     textClass: "text-emerald-900 dark:text-emerald-100",
     badgeClass: "text-emerald-700 dark:text-emerald-200",
   },
-];
+};
 
-export const QUIZ_BY_ACTIVITY: Record<ActivityKey, QuizQuestion[]> = {
+const DEFAULT_DIFFICULTY_META: Omit<DifficultyOption, "key" | "label"> = {
+  xp: 25,
+  containerClass: "bg-neutral-100 dark:bg-neutral-700",
+  textClass: "text-neutral-900 dark:text-neutral-100",
+  badgeClass: "text-neutral-700 dark:text-neutral-200",
+};
+
+export function getDifficultyMeta(name: string): Omit<DifficultyOption, "key" | "label"> {
+  return DIFFICULTY_META_BY_NAME[name.trim().toLowerCase()] ?? DEFAULT_DIFFICULTY_META;
+}
+
+export const QUIZ_BY_ACTIVITY: Record<ActivityKey, LegacyQuizQuestion[]> = {
   grammar: [
     { id: 1, statement: 'No período "O menino correu para casa", a palavra "correu" é um:', options: ["Verbo", "Substantivo", "Adjetivo", "Pronome"], correctOptionIndex: 0 },
     { id: 2, statement: 'Na frase "Ela estava muito feliz", a palavra "feliz" é classificada como:', options: ["Verbo", "Adjetivo", "Advérbio", "Artigo"], correctOptionIndex: 1 },

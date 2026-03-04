@@ -73,7 +73,7 @@ export function QuizStep({
         <div className="mb-3 flex items-center justify-between gap-3 flex-wrap">
           <span className="text-sm md:text-base font-semibold text-neutral-700 dark:text-neutral-200">
             {retryRoundNumber === 0
-              ? `Questão ${currentQuestionPointer + 1} / 10`
+              ? `Questão ${currentQuestionPointer + 1} / ${currentRoundLength}`
               : `Revisão ${retryRoundNumber}: ${currentQuestionPointer + 1} / ${currentRoundLength}`}
           </span>
           <span className="text-sm font-bold text-neutral-600 dark:text-neutral-300">

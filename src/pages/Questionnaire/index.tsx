@@ -2,13 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLeftSidebar, BrowserHeader, PageContainer } from "../../components";
 import {
+  getClasses,
+  getDifficulties,
+  type ClassOption,
+} from "../../services/catalogService";
+import { getProfile } from "../../services/profileService";
+import { getSession } from "../../services/session";
+import {
   ACTIVITY_LABELS,
-  DIFFICULTY_OPTIONS,
-  GRADE_OPTIONS,
   HELP_ACTIONS,
   OPTION_STYLE_BY_INDEX,
-  QUIZ_BY_ACTIVITY,
-  RECOMMENDED_GRADE,
+  getDifficultyMeta,
 } from "./data";
 import {
   DifficultySelectionStep,
@@ -20,6 +24,26 @@ import {
   StepIndicator,
 } from "./components";
 import type { ActivityKey, AnswerResult, DifficultyKey } from "./types";
+import type { QuizQuestion } from "./types";
+import { getQuestions } from "../../services/questionService";
+
+const MIN_QUESTION_QUANTITY = 10;
+const MAX_QUESTION_QUANTITY = 15;
+
+function getRandomQuestionQuantity(): number {
+  return Math.floor(Math.random() * (MAX_QUESTION_QUANTITY - MIN_QUESTION_QUANTITY + 1)) + MIN_QUESTION_QUANTITY;
+}
+
+function getOptionIndexByAlternative(alternative: "a" | "b" | "c" | "d"): number {
+  const optionIndexByAlternative: Record<"a" | "b" | "c" | "d", number> = {
+    a: 0,
+    b: 1,
+    c: 2,
+    d: 3,
+  };
+
+  return optionIndexByAlternative[alternative];
+}
 
 function Questionnaire() {
   const navigate = useNavigate();
@@ -29,8 +53,18 @@ function Questionnaire() {
   const activity: ActivityKey = activityParam === "grammar" || activityParam === "reading" ? activityParam : "grammar";
 
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
+  const [gradeOptions, setGradeOptions] = useState<ClassOption[]>([]);
+  const [loadingGrades, setLoadingGrades] = useState(false);
+  const [gradesError, setGradesError] = useState<string | null>(null);
+  const [profileClassValue, setProfileClassValue] = useState<string | null>(null);
+  const [difficultyOptions, setDifficultyOptions] = useState<{ key: number; label: string; xp: number; containerClass: string; textClass: string; badgeClass: string; }[]>([]);
+  const [loadingDifficulties, setLoadingDifficulties] = useState(false);
+  const [difficultiesError, setDifficultiesError] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyKey | null>(null);
   const [hasStartedQuiz, setHasStartedQuiz] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState<string | null>(null);
 
   const [currentRoundQuestionIds, setCurrentRoundQuestionIds] = useState<number[]>([]);
   const [currentQuestionPointer, setCurrentQuestionPointer] = useState(0);
@@ -48,8 +82,7 @@ function Questionnaire() {
   const [storedBestStreak, setStoredBestStreak] = useState(0);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
 
-  const quizQuestions = QUIZ_BY_ACTIVITY[activity];
-  const selectedDifficultyData = DIFFICULTY_OPTIONS.find((option) => option.key === selectedDifficulty);
+  const selectedDifficultyData = difficultyOptions.find((option) => option.key === selectedDifficulty);
 
   const currentRoundQuestions = useMemo(
     () =>
@@ -78,7 +111,115 @@ function Questionnaire() {
     return 3;
   }, [selectedGrade, selectedDifficulty]);
 
+  const recommendedGrade = useMemo(() => {
+    if (!profileClassValue) {
+      return null;
+    }
+
+    const matchedGrade = gradeOptions.find(
+      (grade) => String(grade.id) === profileClassValue || grade.name === profileClassValue,
+    );
+
+    return matchedGrade?.name ?? null;
+  }, [gradeOptions, profileClassValue]);
+
   const streakStorageKey = useMemo(() => `portgo.quiz.bestStreak.${activity}`, [activity]);
+
+  useEffect(() => {
+    const fetchProfileClass = async () => {
+      const session = getSession();
+
+      if (!session) {
+        setProfileClassValue(null);
+        return;
+      }
+
+      try {
+        const { user } = await getProfile(session.uuid, session.token);
+        setProfileClassValue(user.class !== null ? String(user.class) : null);
+      } catch {
+        setProfileClassValue(null);
+      }
+    };
+
+    fetchProfileClass();
+  }, []);
+
+  useEffect(() => {
+    const fetchDifficulties = async () => {
+      setLoadingDifficulties(true);
+      setDifficultiesError(null);
+
+      try {
+        const response = await getDifficulties();
+        const mappedDifficulties = response.difficulties.map((difficulty) => ({
+          key: difficulty.id,
+          label: difficulty.name,
+          ...getDifficultyMeta(difficulty.name),
+        }));
+
+        setDifficultyOptions(mappedDifficulties);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar as dificuldades.";
+        setDifficultiesError(message);
+        setDifficultyOptions([]);
+      } finally {
+        setLoadingDifficulties(false);
+      }
+    };
+
+    fetchDifficulties();
+  }, []);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      setLoadingGrades(true);
+      setGradesError(null);
+
+      try {
+        const response = await getClasses();
+        setGradeOptions(response.classes);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar as séries.";
+        setGradesError(message);
+        setGradeOptions([]);
+      } finally {
+        setLoadingGrades(false);
+      }
+    };
+
+    fetchClasses();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedGrade) {
+      return;
+    }
+
+    const hasSelectedGrade = gradeOptions.some((grade) => grade.name === selectedGrade);
+    if (!hasSelectedGrade) {
+      setSelectedGrade(null);
+      resetQuizState();
+    }
+  }, [gradeOptions, selectedGrade]);
+
+  useEffect(() => {
+    if (selectedDifficulty === null) {
+      return;
+    }
+
+    const hasSelectedDifficulty = difficultyOptions.some((difficulty) => difficulty.key === selectedDifficulty);
+    if (!hasSelectedDifficulty) {
+      setSelectedDifficulty(null);
+      resetQuizState();
+    }
+  }, [difficultyOptions, selectedDifficulty]);
 
   useEffect(() => {
     const rawValue = window.localStorage.getItem(streakStorageKey);
@@ -99,6 +240,9 @@ function Questionnaire() {
 
   const resetQuizState = () => {
     setHasStartedQuiz(false);
+    setQuizQuestions([]);
+    setLoadingQuestions(false);
+    setQuestionsError(null);
     setCurrentRoundQuestionIds([]);
     setCurrentQuestionPointer(0);
     setPendingRetryQuestionIds([]);
@@ -114,19 +258,68 @@ function Questionnaire() {
   };
 
   const handleStartQuiz = () => {
-    setHasStartedQuiz(true);
-    setCurrentRoundQuestionIds(quizQuestions.map((question) => question.id));
-    setCurrentQuestionPointer(0);
-    setPendingRetryQuestionIds([]);
-    setRetryRoundNumber(0);
-    setSelectedOptionIndex(null);
-    setLastAnswerResult(null);
-    setHelpMessage(null);
-    setHelpUsage({ hint: false, removeTwo: false, skipQuestion: false });
-    setHiddenOptionsByQuestionId({});
-    setCurrentStreak(0);
-    setBestStreak(0);
-    setIsQuizFinished(false);
+    const selectedClass = gradeOptions.find((grade) => grade.name === selectedGrade);
+
+    if (!selectedClass || selectedDifficulty === null) {
+      setQuestionsError("Selecione série e dificuldade para iniciar o questionário.");
+      return;
+    }
+
+    const loadQuestions = async () => {
+      const randomQuestionQuantity = getRandomQuestionQuantity();
+
+      setLoadingQuestions(true);
+      setQuestionsError(null);
+
+      try {
+        const response = await getQuestions({
+          class_id: String(selectedClass.id),
+          difficulty_id: String(selectedDifficulty),
+          quantity: String(randomQuestionQuantity),
+        });
+
+        const mappedQuestions: QuizQuestion[] = response.questions.map((question) => ({
+          id: question.id,
+          statement: question.statement,
+          options: [
+            question.alternative_a,
+            question.alternative_b,
+            question.alternative_c,
+            question.alternative_d,
+          ],
+          correctOptionIndex: getOptionIndexByAlternative(question.correct_alternative),
+          tip: question.tip,
+        }));
+
+        if (mappedQuestions.length === 0) {
+          setQuestionsError("Nenhuma questão disponível para os filtros selecionados.");
+          return;
+        }
+
+        setQuizQuestions(mappedQuestions);
+        setHasStartedQuiz(true);
+        setCurrentRoundQuestionIds(mappedQuestions.map((question) => question.id));
+        setCurrentQuestionPointer(0);
+        setPendingRetryQuestionIds([]);
+        setRetryRoundNumber(0);
+        setSelectedOptionIndex(null);
+        setLastAnswerResult(null);
+        setHelpMessage(null);
+        setHelpUsage({ hint: false, removeTwo: false, skipQuestion: false });
+        setHiddenOptionsByQuestionId({});
+        setCurrentStreak(0);
+        setBestStreak(0);
+        setIsQuizFinished(false);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Não foi possível carregar as questões.";
+        setQuestionsError(message);
+        setHasStartedQuiz(false);
+      } finally {
+        setLoadingQuestions(false);
+      }
+    };
+
+    loadQuestions();
   };
 
   const advanceQuestionFlow = (nextRetryList: number[]) => {
@@ -183,7 +376,7 @@ function Questionnaire() {
     }
 
     setHelpUsage((previousValue) => ({ ...previousValue, hint: true }));
-    setHelpMessage("DICA: Leia com calma o enunciado e elimine as alternativas que não se conectam com a ideia principal da pergunta.");
+    setHelpMessage(currentQuestion.tip ?? "DICA: Leia com calma o enunciado e elimine alternativas inconsistentes.");
   };
 
   const handleUseRemoveThree = () => {
@@ -255,8 +448,28 @@ function Questionnaire() {
 
               {!selectedGrade && (
                 <GradeSelectionStep
-                  grades={GRADE_OPTIONS}
-                  recommendedGrade={RECOMMENDED_GRADE}
+                  grades={gradeOptions}
+                  isLoading={loadingGrades}
+                  errorMessage={gradesError}
+                  onRetryLoad={async () => {
+                    setLoadingGrades(true);
+                    setGradesError(null);
+
+                    try {
+                      const response = await getClasses();
+                      setGradeOptions(response.classes);
+                    } catch (error) {
+                      const message =
+                        error instanceof Error
+                          ? error.message
+                          : "Não foi possível carregar as séries.";
+                      setGradesError(message);
+                      setGradeOptions([]);
+                    } finally {
+                      setLoadingGrades(false);
+                    }
+                  }}
+                  recommendedGrade={recommendedGrade}
                   onSelectGrade={(grade) => {
                     setSelectedGrade(grade);
                     setSelectedDifficulty(null);
@@ -268,7 +481,33 @@ function Questionnaire() {
               {selectedGrade && !selectedDifficulty && (
                 <DifficultySelectionStep
                   selectedGrade={selectedGrade}
-                  options={DIFFICULTY_OPTIONS}
+                  options={difficultyOptions}
+                  isLoading={loadingDifficulties}
+                  errorMessage={difficultiesError}
+                  onRetryLoad={async () => {
+                    setLoadingDifficulties(true);
+                    setDifficultiesError(null);
+
+                    try {
+                      const response = await getDifficulties();
+                      const mappedDifficulties = response.difficulties.map((difficulty) => ({
+                        key: difficulty.id,
+                        label: difficulty.name,
+                        ...getDifficultyMeta(difficulty.name),
+                      }));
+
+                      setDifficultyOptions(mappedDifficulties);
+                    } catch (error) {
+                      const message =
+                        error instanceof Error
+                          ? error.message
+                          : "Não foi possível carregar as dificuldades.";
+                      setDifficultiesError(message);
+                      setDifficultyOptions([]);
+                    } finally {
+                      setLoadingDifficulties(false);
+                    }
+                  }}
                   onSelectDifficulty={(difficulty) => {
                     setSelectedDifficulty(difficulty);
                     resetQuizState();
@@ -286,8 +525,16 @@ function Questionnaire() {
                   selectedGrade={selectedGrade}
                   selectedDifficultyLabel={selectedDifficultyData.label}
                   lessonXp={selectedDifficultyData.xp}
+                  questionCountLabel={`${MIN_QUESTION_QUANTITY} a ${MAX_QUESTION_QUANTITY} (sorteado ao iniciar)`}
+                  isLoading={loadingQuestions}
                   onStartQuiz={handleStartQuiz}
                 />
+              )}
+
+              {selectedGrade && selectedDifficulty && selectedDifficultyData && !hasStartedQuiz && !isQuizFinished && questionsError && (
+                <div className="mt-4 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/10 p-4">
+                  <p className="text-sm font-medium text-red-700 dark:text-red-200">{questionsError}</p>
+                </div>
               )}
 
               {selectedGrade && selectedDifficulty && selectedDifficultyData && hasStartedQuiz && currentQuestion && (

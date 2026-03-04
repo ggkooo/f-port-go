@@ -18,6 +18,15 @@ export type ShiftsResponse = {
   shifts: ShiftOption[];
 };
 
+export type DifficultyOption = {
+  id: number;
+  name: string;
+};
+
+export type DifficultiesResponse = {
+  difficulties: DifficultyOption[];
+};
+
 export async function getClasses(): Promise<ClassesResponse> {
   const body = await requestJson<ClassesResponse>(
     `${AUTH_API_BASE_URL}/classes`,
@@ -48,4 +57,20 @@ export async function getShifts(): Promise<ShiftsResponse> {
   );
 
   return body ?? { shifts: [] };
+}
+
+export async function getDifficulties(): Promise<DifficultiesResponse> {
+  const body = await requestJson<DifficultiesResponse>(
+    `${AUTH_API_BASE_URL}/difficulties`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "X-API-KEY": AUTH_API_KEY,
+      },
+    },
+    "Não foi possível carregar as dificuldades.",
+  );
+
+  return body ?? { difficulties: [] };
 }
