@@ -1,6 +1,6 @@
 # PortGO Authentication, Dashboard, Store, Ranking, Calendar, Questionnaire & Settings
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, a full Questionnaire flow (grade selection, difficulty selection, quiz and review rounds), and a Settings page for profile and academic information management.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules, daily challenges, and live streak data from API, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, a full Questionnaire flow (grade selection, difficulty selection, quiz and review rounds) with automatic daily streak completion, and a Settings page for profile and academic information management.
 
 ## 📸 Screenshots
 
@@ -103,6 +103,13 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
     - REMOVER 2 ALTERNATIVAS
     - PULAR QUESTÃO
   - Consecutive correct-answer streak tracking
+  - On lesson completion, checks `/users/{uuid}/streak/check-today`
+  - If `lesson_done_today` is `false`, automatically triggers `PATCH /users/{uuid}/streak/complete-today`
+
+- 🔥 **Streak Integration**
+  - Home dashboard streak card uses API data from `/users/{uuid}/streak`
+  - Current streak value is rendered dynamically (singular/plural day label)
+  - Daily completion is idempotent via check-before-patch flow
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -346,6 +353,18 @@ The application integrates with a Laravel backend API running on `http://localho
   - Query params: `class_id`, `difficulty_id`, `quantity`
   - Response: `{ questions: [{ id, statement, alternative_a, alternative_b, alternative_c, alternative_d, correct_alternative, tip, difficulty_id, class_id }] }`
 
+### Streak Endpoints
+
+- **GET** `/users/{uuid}/streak` - Load user streak summary for Home dashboard
+  - Response: `{ user_uuid, current_streak, best_streak, last_lesson_date, lesson_done_today }`
+
+- **GET** `/users/{uuid}/streak/check-today` - Check if current day was already counted
+  - Response: `{ user_uuid, date, lesson_done_today, last_lesson_date }`
+
+- **PATCH** `/users/{uuid}/streak/complete-today` - Mark today as completed in streak
+  - Request body: none
+  - Used only when `lesson_done_today` is `false`
+
 ### Session Management
 
 Sessions are stored in `sessionStorage` with automatic expiration after 7 days. The session includes:
@@ -389,6 +408,12 @@ Services handle API communication and business logic:
   - `clearSession()` - Remove session data (logout)
   - `getSessionToken()` - Get authentication token from session
   - Automatic expiration validation and cleanup
+
+- **streakService.ts** - Streak service
+  - `getUserStreak(uuid, token)` - Load Home streak card data
+  - `checkTodayStreak(uuid, token)` - Check if the current day is already completed
+  - `completeTodayStreak(uuid, token)` - Complete current day streak without payload
+  - `syncTodayStreakCompletion(uuid, token)` - Idempotent check-then-complete orchestration
 
 ## 🎨 Styling
 
