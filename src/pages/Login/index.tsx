@@ -4,7 +4,7 @@ import {
   LoginForm,
 } from "./components";
 import { BrowserHeader, DarkModeToggle, LeftPanel, PageContainer } from "../../components";
-import { login } from "../../services/auth";
+import { login } from "../../services/authService";
 import { saveSession } from "../../services/session";
 
 function Login() {

@@ -52,3 +52,16 @@ export function getSessionToken(): string | null {
   const session = getSession();
   return session?.token ?? null;
 }
+
+export function updateSession(partialSession: Partial<UserSession>): void {
+  const currentSession = getSession();
+
+  if (!currentSession) {
+    return;
+  }
+
+  saveSession({
+    ...currentSession,
+    ...partialSession,
+  });
+}
