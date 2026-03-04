@@ -2,14 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLeftSidebar, BrowserHeader, PageContainer } from "../../components";
 import {
+  getActivityTypes,
   getClasses,
   getDifficulties,
+  type ActivityTypeOption,
   type ClassOption,
 } from "../../services/catalogService";
 import { getProfile } from "../../services/profileService";
 import { getSession } from "../../services/session";
 import {
-  ACTIVITY_LABELS,
   HELP_ACTIONS,
   OPTION_STYLE_BY_INDEX,
   getDifficultyMeta,
@@ -23,7 +24,7 @@ import {
   ReadyStep,
   StepIndicator,
 } from "./components";
-import type { ActivityKey, AnswerResult, DifficultyKey } from "./types";
+import type { AnswerResult, DifficultyKey } from "./types";
 import type { QuizQuestion } from "./types";
 import { getQuestions } from "../../services/questionService";
 
@@ -49,13 +50,16 @@ function Questionnaire() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const activityParam = searchParams.get("activity") ?? searchParams.get("atividade");
-  const activity: ActivityKey = activityParam === "grammar" || activityParam === "reading" ? activityParam : "grammar";
+  const activityTypeIdParam = searchParams.get("activityTypeId");
+  const selectedActivityTypeId = activityTypeIdParam ? Number(activityTypeIdParam) : null;
 
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [gradeOptions, setGradeOptions] = useState<ClassOption[]>([]);
   const [loadingGrades, setLoadingGrades] = useState(false);
   const [gradesError, setGradesError] = useState<string | null>(null);
+  const [activityTypes, setActivityTypes] = useState<ActivityTypeOption[]>([]);
+  const [loadingActivityTypes, setLoadingActivityTypes] = useState(false);
+  const [activityTypesError, setActivityTypesError] = useState<string | null>(null);
   const [profileClassValue, setProfileClassValue] = useState<string | null>(null);
   const [difficultyOptions, setDifficultyOptions] = useState<{ key: number; label: string; xp: number; containerClass: string; textClass: string; badgeClass: string; }[]>([]);
   const [loadingDifficulties, setLoadingDifficulties] = useState(false);
@@ -83,6 +87,11 @@ function Questionnaire() {
   const [isQuizFinished, setIsQuizFinished] = useState(false);
 
   const selectedDifficultyData = difficultyOptions.find((option) => option.key === selectedDifficulty);
+  const selectedActivityType = useMemo(
+    () => activityTypes.find((activityType) => activityType.id === selectedActivityTypeId) ?? null,
+    [activityTypes, selectedActivityTypeId],
+  );
+  const activityLabel = selectedActivityType?.name ?? "Atividade";
 
   const currentRoundQuestions = useMemo(
     () =>
@@ -123,7 +132,33 @@ function Questionnaire() {
     return matchedGrade?.name ?? null;
   }, [gradeOptions, profileClassValue]);
 
-  const streakStorageKey = useMemo(() => `portgo.quiz.bestStreak.${activity}`, [activity]);
+  const streakStorageKey = useMemo(
+    () => `portgo.quiz.bestStreak.activityType.${selectedActivityTypeId ?? "unknown"}`,
+    [selectedActivityTypeId],
+  );
+
+  useEffect(() => {
+    const fetchActivityTypes = async () => {
+      setLoadingActivityTypes(true);
+      setActivityTypesError(null);
+
+      try {
+        const response = await getActivityTypes();
+        setActivityTypes(response.activity_types);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar os tipos de atividade.";
+        setActivityTypesError(message);
+        setActivityTypes([]);
+      } finally {
+        setLoadingActivityTypes(false);
+      }
+    };
+
+    fetchActivityTypes();
+  }, []);
 
   useEffect(() => {
     const fetchProfileClass = async () => {
@@ -260,8 +295,13 @@ function Questionnaire() {
   const handleStartQuiz = () => {
     const selectedClass = gradeOptions.find((grade) => grade.name === selectedGrade);
 
-    if (!selectedClass || selectedDifficulty === null) {
-      setQuestionsError("Selecione série e dificuldade para iniciar o questionário.");
+    if (!selectedClass || selectedDifficulty === null || selectedActivityTypeId === null || Number.isNaN(selectedActivityTypeId)) {
+      setQuestionsError("Selecione uma atividade, série e dificuldade para iniciar o questionário.");
+      return;
+    }
+
+    if (!selectedActivityType) {
+      setQuestionsError("Tipo de atividade inválido. Volte para a home e selecione uma atividade.");
       return;
     }
 
@@ -275,6 +315,7 @@ function Questionnaire() {
         const response = await getQuestions({
           class_id: String(selectedClass.id),
           difficulty_id: String(selectedDifficulty),
+          activity_type_id: String(selectedActivityTypeId),
           quantity: String(randomQuestionQuantity),
         });
 
@@ -430,8 +471,11 @@ function Questionnaire() {
                   Preparação do Questionário
                 </h1>
                 <p className="text-sm md:text-base text-neutral-600 dark:text-neutral-300">
-                  Atividade: <span className="font-bold">{ACTIVITY_LABELS[activity]}</span>
+                  Atividade: <span className="font-bold">{activityLabel}</span>
                 </p>
+                {activityTypesError && (
+                  <p className="text-xs text-amber-700 dark:text-amber-200 mt-1">{activityTypesError}</p>
+                )}
               </div>
 
               <button
@@ -521,12 +565,12 @@ function Questionnaire() {
 
               {selectedGrade && selectedDifficulty && selectedDifficultyData && !hasStartedQuiz && !isQuizFinished && (
                 <ReadyStep
-                  activityLabel={ACTIVITY_LABELS[activity]}
+                  activityLabel={activityLabel}
                   selectedGrade={selectedGrade}
                   selectedDifficultyLabel={selectedDifficultyData.label}
                   lessonXp={selectedDifficultyData.xp}
                   questionCountLabel={`${MIN_QUESTION_QUANTITY} a ${MAX_QUESTION_QUANTITY} (sorteado ao iniciar)`}
-                  isLoading={loadingQuestions}
+                  isLoading={loadingQuestions || loadingActivityTypes}
                   onStartQuiz={handleStartQuiz}
                 />
               )}
@@ -539,7 +583,7 @@ function Questionnaire() {
 
               {selectedGrade && selectedDifficulty && selectedDifficultyData && hasStartedQuiz && currentQuestion && (
                 <QuizStep
-                  activityLabel={ACTIVITY_LABELS[activity]}
+                  activityLabel={activityLabel}
                   retryRoundNumber={retryRoundNumber}
                   currentQuestionPointer={currentQuestionPointer}
                   currentRoundLength={currentRoundQuestions.length}
@@ -569,7 +613,7 @@ function Questionnaire() {
 
           <QuestionnaireRightPanel
             helpActions={HELP_ACTIONS}
-            activityLabel={ACTIVITY_LABELS[activity]}
+            activityLabel={activityLabel}
             selectedGrade={selectedGrade}
             selectedDifficultyLabel={selectedDifficultyData?.label}
             lessonXp={selectedDifficultyData?.xp}

@@ -27,6 +27,16 @@ export type DifficultiesResponse = {
   difficulties: DifficultyOption[];
 };
 
+export type ActivityTypeOption = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+export type ActivityTypesResponse = {
+  activity_types: ActivityTypeOption[];
+};
+
 export async function getClasses(): Promise<ClassesResponse> {
   const body = await requestJson<ClassesResponse>(
     `${AUTH_API_BASE_URL}/classes`,
@@ -73,4 +83,20 @@ export async function getDifficulties(): Promise<DifficultiesResponse> {
   );
 
   return body ?? { difficulties: [] };
+}
+
+export async function getActivityTypes(): Promise<ActivityTypesResponse> {
+  const body = await requestJson<ActivityTypesResponse>(
+    `${AUTH_API_BASE_URL}/activity-types`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "X-API-KEY": AUTH_API_KEY,
+      },
+    },
+    "Não foi possível carregar os tipos de atividade.",
+  );
+
+  return body ?? { activity_types: [] };
 }

@@ -28,6 +28,7 @@ export type QuestionsResponse = {
 type GetQuestionsPayload = {
   class_id: string;
   difficulty_id: string;
+  activity_type_id: string;
   quantity: string;
 };
 
@@ -35,6 +36,7 @@ export async function getQuestions(payload: GetQuestionsPayload): Promise<Questi
   const query = new URLSearchParams({
     class_id: payload.class_id,
     difficulty_id: payload.difficulty_id,
+    activity_type_id: payload.activity_type_id,
     quantity: payload.quantity,
   });
 

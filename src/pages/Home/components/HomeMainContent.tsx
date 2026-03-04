@@ -1,23 +1,48 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  getActivityTypes,
+  type ActivityTypeOption,
+} from "../../../services/catalogService";
 
-const studyModules = [
-  {
-    key: "grammar",
-    title: "Gramática",
-    icon: "text_fields",
-    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
-    iconClass: "text-blue-700 dark:text-blue-200",
-    textClass: "text-blue-900 dark:text-blue-100",
-  },
-  {
-    key: "reading",
-    title: "Interpretação Textual",
-    icon: "auto_stories",
-    containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
-    iconClass: "text-emerald-700 dark:text-emerald-200",
-    textClass: "text-emerald-900 dark:text-emerald-100",
-  },
+type ActivityModuleStyle = {
+  icon: string;
+  containerClass: string;
+  iconClass: string;
+  textClass: string;
+};
+
+const DEFAULT_ACTIVITY_TYPE_MODULES: ActivityTypeOption[] = [
+  { id: 1, name: "Gramática", slug: "gramatica" },
+  { id: 2, name: "Interpretação Textual", slug: "interpretacao-textual" },
 ];
+
+function getActivityModuleStyle(slug: string): ActivityModuleStyle {
+  if (slug === "gramatica") {
+    return {
+      icon: "text_fields",
+      containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
+      iconClass: "text-blue-700 dark:text-blue-200",
+      textClass: "text-blue-900 dark:text-blue-100",
+    };
+  }
+
+  if (slug === "interpretacao-textual") {
+    return {
+      icon: "auto_stories",
+      containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
+      iconClass: "text-emerald-700 dark:text-emerald-200",
+      textClass: "text-emerald-900 dark:text-emerald-100",
+    };
+  }
+
+  return {
+    icon: "menu_book",
+    containerClass: "bg-neutral-100 dark:bg-neutral-800",
+    iconClass: "text-neutral-700 dark:text-neutral-200",
+    textClass: "text-neutral-900 dark:text-neutral-100",
+  };
+}
 
 const dailyChallenges = [
   {
@@ -54,6 +79,34 @@ const dailyChallenges = [
 
 export function HomeMainContent() {
   const navigate = useNavigate();
+  const [activityTypes, setActivityTypes] = useState<ActivityTypeOption[]>([]);
+  const [loadingActivityTypes, setLoadingActivityTypes] = useState(false);
+
+  useEffect(() => {
+    const fetchActivityTypes = async () => {
+      setLoadingActivityTypes(true);
+
+      try {
+        const response = await getActivityTypes();
+        setActivityTypes(response.activity_types);
+      } catch {
+        setActivityTypes(DEFAULT_ACTIVITY_TYPE_MODULES);
+      } finally {
+        setLoadingActivityTypes(false);
+      }
+    };
+
+    fetchActivityTypes();
+  }, []);
+
+  const studyModules = useMemo(() => {
+    const source = activityTypes.length > 0 ? activityTypes : DEFAULT_ACTIVITY_TYPE_MODULES;
+
+    return source.map((activityType) => ({
+      ...activityType,
+      ...getActivityModuleStyle(activityType.slug),
+    }));
+  }, [activityTypes]);
 
   return (
     <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
@@ -84,12 +137,13 @@ export function HomeMainContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-3 md:gap-4 lg:gap-5">
         {studyModules.map((module, index) => (
           <button
-            key={module.title}
+            key={module.id}
             type="button"
-            onClick={() => navigate(`/questionnaire?activity=${module.key}`)}
+            onClick={() => navigate(`/questionnaire?activityTypeId=${module.id}`)}
+            disabled={loadingActivityTypes}
             className={`${module.containerClass} p-4 md:p-5 rounded-2xl md:rounded-large flex flex-col justify-between min-h-[130px] md:min-h-[150px] hover:opacity-90 transition-all text-left md:col-start-1 ${
               index === 0 ? "md:row-start-1" : "md:row-start-2"
-            }`}
+            } ${loadingActivityTypes ? "opacity-80 cursor-not-allowed" : ""}`}
           >
             <div className="flex items-center gap-4">
               <div className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center">
@@ -97,7 +151,7 @@ export function HomeMainContent() {
                   {module.icon}
                 </span>
               </div>
-              <span className={`font-bold text-sm md:text-base lg:text-lg ${module.textClass}`}>{module.title}</span>
+              <span className={`font-bold text-sm md:text-base lg:text-lg ${module.textClass}`}>{module.name}</span>
             </div>
 
             <div className="flex items-center">
