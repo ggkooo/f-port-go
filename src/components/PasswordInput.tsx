@@ -2,12 +2,14 @@ interface PasswordInputProps {
   id: string;
   placeholder: string;
   onForgotClick?: () => void;
+  label?: string;
 }
 
 export function PasswordInput({
   id,
   placeholder,
   onForgotClick,
+  label = "Senha",
 }: PasswordInputProps) {
   return (
     <div>
@@ -15,7 +17,7 @@ export function PasswordInput({
         htmlFor={id}
         className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2.5 ml-1 transition-colors group-focus-within:text-blue-500"
       >
-        Senha
+        {label}
       </label>
       <input
         id={id}
