@@ -91,12 +91,13 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 
 - 🧠 **Questionnaire Flow**
   - Activity-based entry from Home modules (Grammar and Reading)
-  - Grade selection with recommended badge
-  - Difficulty selection (easy, medium, hard)
-  - Lesson XP reward by selected difficulty
-  - 10 questions per lesson
+  - Grade selection loaded from API with recommended badge based on profile class
+  - Difficulty selection loaded from API with loading/error/retry states
+  - Lesson XP reward by selected difficulty metadata
+  - Random question quantity between 10 and 15 per lesson
+  - Questions loaded from API according to selected class and difficulty
   - Immediate feedback for correct/incorrect answers
-  - Mandatory review rounds for wrong answers until all are correct
+  - Mandatory review rounds for wrong or skipped answers until all are correct
   - Help tools available once per lesson:
     - DICA
     - REMOVER 2 ALTERNATIVAS
@@ -333,6 +334,18 @@ The application integrates with a Laravel backend API running on `http://localho
   - Request: `{ token: string, email: string, password: string }`
   - Response: `{ message: string }`
 
+### Catalog & Questionnaire Endpoints
+
+- **GET** `/classes` - List available school classes
+  - Response: `{ classes: [{ id: number, name: string }] }`
+
+- **GET** `/difficulties` - List available difficulty levels
+  - Response: `{ difficulties: [{ id: number, name: string }] }`
+
+- **GET** `/questions` - Retrieve lesson questions by class and difficulty
+  - Query params: `class_id`, `difficulty_id`, `quantity`
+  - Response: `{ questions: [{ id, statement, alternative_a, alternative_b, alternative_c, alternative_d, correct_alternative, tip, difficulty_id, class_id }] }`
+
 ### Session Management
 
 Sessions are stored in `sessionStorage` with automatic expiration after 7 days. The session includes:
@@ -346,13 +359,28 @@ Session validation occurs on every app initialization and when accessing protect
 
 Services handle API communication and business logic:
 
-- **auth.ts** - Authentication API service
+- **apiClient.ts** - Shared API client utilities
+  - Centralized JSON requests and standardized error extraction
+  - Base URL and API key configuration
+
+- **authService.ts** - Authentication API service
   - `login(payload)` - Authenticate user and return session data
   - `register(payload)` - Create new user account
   - `forgotPassword(payload)` - Request password reset token
   - `resetPassword(payload)` - Reset password with token
-  - Centralized API error handling with validation message extraction
-  - X-API-KEY header injection for all requests
+
+- **profileService.ts** - User profile service
+  - `getProfile(uuid, token)` - Load profile data
+  - `updateProfile(token, payload)` - Persist profile updates
+
+- **catalogService.ts** - Catalog service
+  - `getClasses()` - Load classes for Settings and Questionnaire
+  - `getShifts()` - Load shifts for Settings
+  - `getDifficulties()` - Load difficulties for Questionnaire
+
+- **questionService.ts** - Questionnaire questions service
+  - `getQuestions({ class_id, difficulty_id, quantity })` - Load lesson questions
+  - Supports correct answer mapping via `correct_alternative`
 
 - **session.ts** - Session management service
   - `saveSession(session)` - Store user session with 7-day expiration
