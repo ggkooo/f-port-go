@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { clearSession, getSession } from "../services/session";
 
-type AppRoute = "/" | "/store" | "/ranking" | "/calendar" | "/settings";
+type AppRoute = "/" | "/store" | "/ranking" | "/calendar" | "/administration" | "/settings";
 
 interface AppLeftSidebarProps {
   activePath?: AppRoute;
@@ -15,6 +15,7 @@ const navItems: Array<{ icon: string; path: AppRoute }> = [
   { icon: "shopping_basket", path: "/store" },
   { icon: "leaderboard", path: "/ranking" },
   { icon: "calendar_today", path: "/calendar" },
+  { icon: "admin_panel_settings", path: "/administration" },
 ];
 
 const pastelPalette = [
@@ -55,6 +56,9 @@ export function AppLeftSidebar({
 }: AppLeftSidebarProps) {
   const navigate = useNavigate();
   const session = getSession();
+  const visibleNavItems = session?.isAdmin
+    ? navItems
+    : navItems.filter((item) => item.path !== "/administration");
   const avatarSeed = getInitialSeed(session?.firstName, session?.email);
   const avatarLetter = avatarSeed.charAt(0).toUpperCase();
   const avatarBackground = getPastelColor(avatarSeed);
@@ -72,7 +76,7 @@ export function AppLeftSidebar({
         </div>
 
         <nav className="flex flex-col gap-4 flex-1">
-          {navItems.map(({ icon, path }) => {
+          {visibleNavItems.map(({ icon, path }) => {
             const isActive = activePath === path;
             const hasNotification = showStoreNotification && path === "/store";
 
@@ -137,7 +141,7 @@ export function AppLeftSidebar({
 
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-neutral-200 dark:border-neutral-700 bg-white/95 dark:bg-neutral-900/95 backdrop-blur px-2 py-2">
         <div className="flex items-center justify-between max-w-md mx-auto">
-          {navItems.map(({ icon, path }) => {
+          {visibleNavItems.map(({ icon, path }) => {
             const isActive = activePath === path;
             const hasNotification = showStoreNotification && path === "/store";
 
