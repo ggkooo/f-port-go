@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { DarkModeToggle } from "./DarkModeToggle";
-import { clearSession } from "../services/session";
+import { clearSession, getSession } from "../services/session";
 
 type AppRoute = "/" | "/store" | "/ranking" | "/calendar" | "/settings";
 
@@ -16,8 +16,43 @@ const navItems: Array<{ icon: string; path: AppRoute }> = [
   { icon: "calendar_today", path: "/calendar" },
 ];
 
+const pastelPalette = [
+  "#FADADD",
+  "#FFE5B4",
+  "#FFFACD",
+  "#D4F5DD",
+  "#D9ECFF",
+  "#E6E0FF",
+  "#F8DFF5",
+  "#FFDCE5",
+];
+
+function getInitialSeed(firstName?: string, email?: string): string {
+  if (firstName?.trim()) {
+    return firstName.trim();
+  }
+
+  if (email?.trim()) {
+    return email.trim().split("@")[0] || email.trim();
+  }
+
+  return "Usuário";
+}
+
+function getPastelColor(seed: string): string {
+  const total = seed
+    .split("")
+    .reduce((accumulator, character) => accumulator + character.charCodeAt(0), 0);
+
+  return pastelPalette[total % pastelPalette.length];
+}
+
 export function AppLeftSidebar({ activePath, showStoreNotification = false }: AppLeftSidebarProps) {
   const navigate = useNavigate();
+  const session = getSession();
+  const avatarSeed = getInitialSeed(session?.firstName, session?.email);
+  const avatarLetter = avatarSeed.charAt(0).toUpperCase();
+  const avatarBackground = getPastelColor(avatarSeed);
 
   const handleLogout = () => {
     clearSession();
@@ -76,12 +111,12 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
             <span className="material-symbols-outlined">logout</span>
           </button>
 
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white dark:border-neutral-700">
-            <img
-              alt="Perfil do usuário"
-              className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA8jxgRwmHa7khknGtCaovN2s-tc3pl4_WW6zQ9yvXglSvhuZD1n81vZhKLM2A07lE1MJOh2Zx2WGN-Nihd0pry50Q_dnKJXmjU6hhyYO-lOWI8LeNkXyR_4u6RBDCW4Bgu58PtHccWqg0iZIMCc0VvH1Yv9ir948Sk3tRUuy5DZXrpNUAsm4A8Q4hAJk5jykRYs_ECNEaHQEk9DsI00aq9pri-BLS1kMk1EAcNVgYFEID9jQrjizP27Kjl_a8cmvo57CqIoBJyarO"
-            />
+          <div
+            aria-label="Inicial do perfil do usuário"
+            className="w-12 h-12 rounded-full border-2 border-white dark:border-neutral-700 flex items-center justify-center text-neutral-900 font-extrabold text-lg"
+            style={{ backgroundColor: avatarBackground }}
+          >
+            {avatarLetter}
           </div>
         </div>
       </aside>

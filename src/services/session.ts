@@ -1,6 +1,7 @@
 export type UserSession = {
   uuid: string;
   email: string;
+  firstName?: string;
   token: string;
   profileCompleted: boolean;
 };

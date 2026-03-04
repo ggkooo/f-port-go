@@ -84,14 +84,20 @@ export function SettingsMainContent() {
 
       try {
         const { user } = await getProfile(session.uuid, session.token);
+        const profileFirstName = user.first_name?.trim() ?? "";
 
         setFormValues({
-          firstName: user.first_name ?? "",
+          firstName: profileFirstName,
           lastName: user.last_name ?? "",
           phone: user.phone ?? "",
           email: user.email ?? "",
           school: user.school ?? "",
           classId: user.class !== null ? String(user.class) : "",
+        });
+
+        updateSession({
+          email: user.email ?? session.email,
+          firstName: profileFirstName || undefined,
         });
 
         setSelectedState(user.state ?? "");
@@ -318,7 +324,11 @@ export function SettingsMainContent() {
 
     try {
       await updateProfile(session.token, payload);
-      updateSession({ profileCompleted: true, email: payload.email });
+      updateSession({
+        profileCompleted: true,
+        email: payload.email,
+        firstName: formValues.firstName.trim() || undefined,
+      });
       setSubmitSuccess("Perfil atualizado com sucesso.");
     } catch (error) {
       const message =
