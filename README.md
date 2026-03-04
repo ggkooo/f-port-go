@@ -1,6 +1,6 @@
 # PortGO Authentication, Dashboard, Store, Ranking, Calendar, Questionnaire & Settings
 
-A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules and daily challenges, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, a full Questionnaire flow (grade selection, difficulty selection, quiz and review rounds), and a Settings page for profile and academic information management.
+A modern, responsive web app built with React, TypeScript, and Vite. The project includes a complete authentication flow (login, registration, and password recovery), a Home learning dashboard with study modules, daily challenges, and live streak data from API, a Store page for XP boosts and streak protection items, a Ranking page with a professional leaderboard experience, a Calendar page for monthly study planning, a full Questionnaire flow (grade selection, difficulty selection, quiz and review rounds) with automatic daily streak completion, and a Settings page for profile and academic information management.
 
 ## 📸 Screenshots
 
@@ -91,17 +91,25 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 
 - 🧠 **Questionnaire Flow**
   - Activity-based entry from Home modules (Grammar and Reading)
-  - Grade selection with recommended badge
-  - Difficulty selection (easy, medium, hard)
-  - Lesson XP reward by selected difficulty
-  - 10 questions per lesson
+  - Grade selection loaded from API with recommended badge based on profile class
+  - Difficulty selection loaded from API with loading/error/retry states
+  - Lesson XP reward by selected difficulty metadata
+  - Random question quantity between 10 and 15 per lesson
+  - Questions loaded from API according to selected class and difficulty
   - Immediate feedback for correct/incorrect answers
-  - Mandatory review rounds for wrong answers until all are correct
+  - Mandatory review rounds for wrong or skipped answers until all are correct
   - Help tools available once per lesson:
     - DICA
     - REMOVER 2 ALTERNATIVAS
     - PULAR QUESTÃO
   - Consecutive correct-answer streak tracking
+  - On lesson completion, checks `/users/{uuid}/streak/check-today`
+  - If `lesson_done_today` is `false`, automatically triggers `PATCH /users/{uuid}/streak/complete-today`
+
+- 🔥 **Streak Integration**
+  - Home dashboard streak card uses API data from `/users/{uuid}/streak`
+  - Current streak value is rendered dynamically (singular/plural day label)
+  - Daily completion is idempotent via check-before-patch flow
   
 - 🎨 **Modern UI/UX**
   - Clean and intuitive interface
@@ -333,6 +341,30 @@ The application integrates with a Laravel backend API running on `http://localho
   - Request: `{ token: string, email: string, password: string }`
   - Response: `{ message: string }`
 
+### Catalog & Questionnaire Endpoints
+
+- **GET** `/classes` - List available school classes
+  - Response: `{ classes: [{ id: number, name: string }] }`
+
+- **GET** `/difficulties` - List available difficulty levels
+  - Response: `{ difficulties: [{ id: number, name: string }] }`
+
+- **GET** `/questions` - Retrieve lesson questions by class and difficulty
+  - Query params: `class_id`, `difficulty_id`, `quantity`
+  - Response: `{ questions: [{ id, statement, alternative_a, alternative_b, alternative_c, alternative_d, correct_alternative, tip, difficulty_id, class_id }] }`
+
+### Streak Endpoints
+
+- **GET** `/users/{uuid}/streak` - Load user streak summary for Home dashboard
+  - Response: `{ user_uuid, current_streak, best_streak, last_lesson_date, lesson_done_today }`
+
+- **GET** `/users/{uuid}/streak/check-today` - Check if current day was already counted
+  - Response: `{ user_uuid, date, lesson_done_today, last_lesson_date }`
+
+- **PATCH** `/users/{uuid}/streak/complete-today` - Mark today as completed in streak
+  - Request body: none
+  - Used only when `lesson_done_today` is `false`
+
 ### Session Management
 
 Sessions are stored in `sessionStorage` with automatic expiration after 7 days. The session includes:
@@ -346,13 +378,28 @@ Session validation occurs on every app initialization and when accessing protect
 
 Services handle API communication and business logic:
 
-- **auth.ts** - Authentication API service
+- **apiClient.ts** - Shared API client utilities
+  - Centralized JSON requests and standardized error extraction
+  - Base URL and API key configuration
+
+- **authService.ts** - Authentication API service
   - `login(payload)` - Authenticate user and return session data
   - `register(payload)` - Create new user account
   - `forgotPassword(payload)` - Request password reset token
   - `resetPassword(payload)` - Reset password with token
-  - Centralized API error handling with validation message extraction
-  - X-API-KEY header injection for all requests
+
+- **profileService.ts** - User profile service
+  - `getProfile(uuid, token)` - Load profile data
+  - `updateProfile(token, payload)` - Persist profile updates
+
+- **catalogService.ts** - Catalog service
+  - `getClasses()` - Load classes for Settings and Questionnaire
+  - `getShifts()` - Load shifts for Settings
+  - `getDifficulties()` - Load difficulties for Questionnaire
+
+- **questionService.ts** - Questionnaire questions service
+  - `getQuestions({ class_id, difficulty_id, quantity })` - Load lesson questions
+  - Supports correct answer mapping via `correct_alternative`
 
 - **session.ts** - Session management service
   - `saveSession(session)` - Store user session with 7-day expiration
@@ -361,6 +408,12 @@ Services handle API communication and business logic:
   - `clearSession()` - Remove session data (logout)
   - `getSessionToken()` - Get authentication token from session
   - Automatic expiration validation and cleanup
+
+- **streakService.ts** - Streak service
+  - `getUserStreak(uuid, token)` - Load Home streak card data
+  - `checkTodayStreak(uuid, token)` - Check if the current day is already completed
+  - `completeTodayStreak(uuid, token)` - Complete current day streak without payload
+  - `syncTodayStreakCompletion(uuid, token)` - Idempotent check-then-complete orchestration
 
 ## 🎨 Styling
 

@@ -12,6 +12,7 @@ interface QuizStepProps {
   currentQuestionPointer: number;
   currentRoundLength: number;
   currentStreak: number;
+  elapsedSeconds: number;
   progressPercentage: number;
   lastAnswerResult: AnswerResult | null;
   helpMessage: string | null;
@@ -34,6 +35,7 @@ export function QuizStep({
   currentQuestionPointer,
   currentRoundLength,
   currentStreak,
+  elapsedSeconds,
   progressPercentage,
   lastAnswerResult,
   helpMessage,
@@ -49,6 +51,9 @@ export function QuizStep({
   onSelectOption,
   onAnswerAndContinue,
 }: QuizStepProps) {
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  const elapsedRemainingSeconds = elapsedSeconds % 60;
+
   const getHelpButtonProps = (key: HelpAction["key"]) => {
     const isUsed = helpUsage[key];
 
@@ -73,12 +78,17 @@ export function QuizStep({
         <div className="mb-3 flex items-center justify-between gap-3 flex-wrap">
           <span className="text-sm md:text-base font-semibold text-neutral-700 dark:text-neutral-200">
             {retryRoundNumber === 0
-              ? `Questão ${currentQuestionPointer + 1} / 10`
+              ? `Questão ${currentQuestionPointer + 1} / ${currentRoundLength}`
               : `Revisão ${retryRoundNumber}: ${currentQuestionPointer + 1} / ${currentRoundLength}`}
           </span>
-          <span className="text-sm font-bold text-neutral-600 dark:text-neutral-300">
-            Acertos seguidos: {currentStreak}
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-bold text-neutral-600 dark:text-neutral-300">
+              Acertos seguidos: {currentStreak}
+            </span>
+            <span className="text-sm font-bold text-neutral-600 dark:text-neutral-300">
+              Tempo: {elapsedMinutes}:{String(elapsedRemainingSeconds).padStart(2, "0")}
+            </span>
+          </div>
         </div>
 
         <div className="h-2.5 w-full bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">

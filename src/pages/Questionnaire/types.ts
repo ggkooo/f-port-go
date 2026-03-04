@@ -1,5 +1,5 @@
 export type ActivityKey = "grammar" | "reading";
-export type DifficultyKey = "easy" | "medium" | "hard";
+export type DifficultyKey = number;
 export type AnswerResult = "correct" | "wrong";
 
 export interface QuizQuestion {
@@ -7,6 +7,7 @@ export interface QuizQuestion {
   statement: string;
   options: string[];
   correctOptionIndex: number;
+  tip?: string | null;
 }
 
 export interface DifficultyOption {
