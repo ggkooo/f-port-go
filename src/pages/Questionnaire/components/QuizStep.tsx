@@ -147,7 +147,7 @@ export function QuizStep({
       </div>
 
       <div className="mb-6 p-5 md:p-7 bg-neutral-100 dark:bg-neutral-700 rounded-2xl border border-neutral-200 dark:border-neutral-600">
-        <p className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug">
+        <p className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug whitespace-pre-wrap">
           {currentQuestion.statement}
         </p>
       </div>
