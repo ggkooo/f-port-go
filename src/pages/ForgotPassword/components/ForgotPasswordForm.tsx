@@ -3,9 +3,17 @@ import { useNavigate } from "react-router-dom";
 
 interface ForgotPasswordFormProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+  isSubmitting?: boolean;
+  errorMessage?: string | null;
+  successMessage?: string | null;
 }
 
-export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
+export function ForgotPasswordForm({
+  onSubmit,
+  isSubmitting = false,
+  errorMessage,
+  successMessage,
+}: ForgotPasswordFormProps) {
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,14 +36,27 @@ export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
 
         {/* Form */}
         <form action="#" className="space-y-5" onSubmit={handleSubmit}>
+          {errorMessage && (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
+              {errorMessage}
+            </p>
+          )}
+
+          {successMessage && (
+            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-600 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-300">
+              {successMessage}
+            </p>
+          )}
+
           <EmailInput id="email" placeholder="seu@email.com" />
 
           {/* Submit Button */}
           <button
             type="submit"
+            disabled={isSubmitting}
             className="w-full bg-[#D4EAFC] hover:bg-[#C2E2FF] dark:bg-blue-500 dark:hover:bg-blue-400 text-blue-900 dark:text-white font-extrabold py-4 rounded-2xl shadow-sm transition-all active:scale-[0.98] mt-3 flex items-center justify-center gap-3 group"
           >
-            <span className="text-lg">Enviar Link</span>
+            <span className="text-lg">{isSubmitting ? "Enviando..." : "Enviar Link"}</span>
             <span className="material-symbols-outlined text-2xl transition-transform group-hover:translate-x-1.5">
               arrow_right_alt
             </span>
