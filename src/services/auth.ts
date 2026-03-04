@@ -21,6 +21,7 @@ export type LoginResponse = {
   message: string;
   uuid: string;
   email: string;
+  profile_completed: boolean;
   token: string;
 };
 

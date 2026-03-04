@@ -2,6 +2,7 @@ export type UserSession = {
   uuid: string;
   email: string;
   token: string;
+  profileCompleted: boolean;
 };
 
 const USER_SESSION_KEY = "user_session";

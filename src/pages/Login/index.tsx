@@ -30,9 +30,14 @@ function Login() {
         password,
       });
 
-      const { uuid, email: userEmail, token } = response.data;
+      const {
+        uuid,
+        email: userEmail,
+        token,
+        profile_completed: profileCompleted,
+      } = response.data;
 
-      saveSession({ uuid, email: userEmail, token });
+      saveSession({ uuid, email: userEmail, token, profileCompleted });
 
       setSuccessMessage("Login realizado com sucesso.");
       navigate("/");
