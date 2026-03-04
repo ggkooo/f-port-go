@@ -6,6 +6,7 @@ import {
 } from "../../../services/catalogService";
 import { getSession } from "../../../services/session";
 import { getAndStoreTodayChallenges, type UserChallenge } from "../../../services/challengeService";
+import { getUserStreak } from "../../../services/streakService";
 
 type ActivityModuleStyle = {
   icon: string;
@@ -104,6 +105,7 @@ export function HomeMainContent() {
   const [loadingActivityTypes, setLoadingActivityTypes] = useState(false);
   const [dailyChallenges, setDailyChallenges] = useState<UserChallenge[]>([]);
   const [loadingChallenges, setLoadingChallenges] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(0);
 
   useEffect(() => {
     const fetchActivityTypes = async () => {
@@ -147,6 +149,26 @@ export function HomeMainContent() {
     fetchDailyChallenges();
   }, []);
 
+  useEffect(() => {
+    const fetchUserStreak = async () => {
+      const session = getSession();
+
+      if (!session?.uuid || !session.token) {
+        setCurrentStreak(0);
+        return;
+      }
+
+      try {
+        const response = await getUserStreak(session.uuid, session.token);
+        setCurrentStreak(response.current_streak);
+      } catch {
+        setCurrentStreak(0);
+      }
+    };
+
+    fetchUserStreak();
+  }, []);
+
   const studyModules = useMemo(() => {
     const source = activityTypes.length > 0 ? activityTypes : DEFAULT_ACTIVITY_TYPE_MODULES;
 
@@ -171,7 +193,9 @@ export function HomeMainContent() {
               </div>
               <div>
                 <h3 className="font-bold text-neutral-900 dark:text-white">Ofensiva Atual</h3>
-                <p className="text-neutral-500 dark:text-neutral-400 text-sm">7 dias seguidos de estudo</p>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+                  {currentStreak} {currentStreak === 1 ? "dia" : "dias"} seguidos de estudo
+                </p>
               </div>
             </div>
 

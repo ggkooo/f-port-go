@@ -14,6 +14,7 @@ import {
   getAndStoreTodayChallenges,
   syncChallengeProgressFromSession,
 } from "../../services/challengeService";
+import { syncTodayStreakCompletion } from "../../services/streakService";
 import {
   HELP_ACTIONS,
   OPTION_STYLE_BY_INDEX,
@@ -332,6 +333,8 @@ function Questionnaire() {
     window.localStorage.setItem(metricsStorageKey, JSON.stringify(sessionMetrics));
     setChallengeSyncStatus("syncing");
     setChallengeSyncError(null);
+
+    syncTodayStreakCompletion(session.uuid, session.token).catch(() => undefined);
 
     syncChallengeProgressFromSession(session.uuid, session.token, sessionMetrics)
       .then(() => {
