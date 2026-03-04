@@ -32,6 +32,19 @@ type GetQuestionsPayload = {
   quantity: string;
 };
 
+export type CreateQuestionPayload = {
+  statement: string;
+  alternative_a: string;
+  alternative_b: string;
+  alternative_c: string;
+  alternative_d: string;
+  correct_alternative: "a" | "b" | "c" | "d";
+  tip: string;
+  difficulty_id: string;
+  class_id: string;
+  activity_type_id: string;
+};
+
 export async function getQuestions(payload: GetQuestionsPayload): Promise<QuestionsResponse> {
   const query = new URLSearchParams({
     class_id: payload.class_id,
@@ -53,4 +66,37 @@ export async function getQuestions(payload: GetQuestionsPayload): Promise<Questi
   );
 
   return body ?? { questions: [] };
+}
+
+export async function getAllQuestions(): Promise<QuestionsResponse> {
+  const body = await requestJson<QuestionsResponse>(
+    `${AUTH_API_BASE_URL}/questions`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "X-API-KEY": AUTH_API_KEY,
+      },
+    },
+    "Não foi possível carregar as questões.",
+  );
+
+  return body ?? { questions: [] };
+}
+
+export async function createQuestion(payload: CreateQuestionPayload, token: string): Promise<void> {
+  await requestJson<Record<string, unknown>>(
+    `${AUTH_API_BASE_URL}/questions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        "X-API-KEY": AUTH_API_KEY,
+      },
+      body: JSON.stringify(payload),
+    },
+    "Não foi possível cadastrar a questão.",
+  );
 }
