@@ -10,6 +10,9 @@ import {
 import {
   createQuestion,
   getAllQuestions,
+  getQuestionById,
+  updateQuestion,
+  deleteQuestion,
   type QuestionApiItem,
 } from "../../../services/questionService";
 import { getSession } from "../../../services/session";
@@ -43,6 +46,9 @@ export function AdministrationQuestionsContent() {
   const [loadingActivityTypes, setLoadingActivityTypes] = useState(false);
   const [loadingClasses, setLoadingClasses] = useState(false);
   const [loadingDifficulties, setLoadingDifficulties] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
+  const [loadingEditingQuestion, setLoadingEditingQuestion] = useState(false);
+  const [deletingQuestionId, setDeletingQuestionId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchActivityTypes = async () => {
@@ -125,7 +131,56 @@ export function AdministrationQuestionsContent() {
     }));
   };
 
-  const handleCreateQuestion = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLoadQuestionForEditing = async (questionId: number) => {
+    setLoadingEditingQuestion(true);
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    try {
+      const question = await getQuestionById(questionId);
+      
+      setFormValues({
+        statement: question.statement,
+        alternative_a: question.alternative_a,
+        alternative_b: question.alternative_b,
+        alternative_c: question.alternative_c,
+        alternative_d: question.alternative_d,
+        correct_alternative: question.correct_alternative,
+        tip: question.tip || "",
+        difficulty_id: String(question.difficulty_id),
+        class_id: String(question.class_id),
+        activity_type_id: String(question.activity_type_id),
+      });
+
+      setEditingQuestionId(questionId);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar a questão.";
+      setSubmitError(message);
+    } finally {
+      setLoadingEditingQuestion(false);
+    }
+  };
+
+  const handleCancelEditing = () => {
+    setEditingQuestionId(null);
+    setFormValues({
+      statement: "",
+      alternative_a: "",
+      alternative_b: "",
+      alternative_c: "",
+      alternative_d: "",
+      correct_alternative: "",
+      tip: "",
+      difficulty_id: "",
+      class_id: "",
+      activity_type_id: "",
+    });
+  };
+
+  const handleSaveQuestion = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitError(null);
     setSubmitSuccess(null);
@@ -135,7 +190,7 @@ export function AdministrationQuestionsContent() {
       const session = getSession();
 
       if (!session) {
-        setSubmitError("Sessão inválida para cadastrar questão.");
+        setSubmitError("Sessão inválida para salvar questão.");
         return;
       }
 
@@ -144,7 +199,7 @@ export function AdministrationQuestionsContent() {
         return;
       }
 
-      await createQuestion({
+      const payload = {
         statement: formValues.statement.trim(),
         alternative_a: formValues.alternative_a.trim(),
         alternative_b: formValues.alternative_b.trim(),
@@ -155,9 +210,16 @@ export function AdministrationQuestionsContent() {
         difficulty_id: formValues.difficulty_id,
         class_id: formValues.class_id,
         activity_type_id: formValues.activity_type_id,
-      }, session.token);
+      };
 
-      setSubmitSuccess("Questão cadastrada com sucesso.");
+      if (editingQuestionId) {
+        await updateQuestion(editingQuestionId, payload, session.token);
+        setSubmitSuccess("Questão atualizada com sucesso.");
+      } else {
+        await createQuestion(payload, session.token);
+        setSubmitSuccess("Questão cadastrada com sucesso.");
+      }
+
       setFormValues({
         statement: "",
         alternative_a: "",
@@ -170,15 +232,46 @@ export function AdministrationQuestionsContent() {
         class_id: "",
         activity_type_id: "",
       });
+      setEditingQuestionId(null);
       await fetchQuestions();
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Não foi possível cadastrar a questão.";
+          : "Não foi possível salvar a questão.";
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteQuestion = async (questionId: number) => {
+    if (!window.confirm("Tem certeza que deseja deletar esta questão?")) {
+      return;
+    }
+
+    setDeletingQuestionId(questionId);
+    setSubmitError(null);
+
+    try {
+      const session = getSession();
+
+      if (!session) {
+        setSubmitError("Sessão inválida para deletar questão.");
+        return;
+      }
+
+      await deleteQuestion(questionId, session.token);
+      setSubmitSuccess("Questão deletada com sucesso.");
+      await fetchQuestions();
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Não foi possível deletar a questão.";
+      setSubmitError(message);
+    } finally {
+      setDeletingQuestionId(null);
     }
   };
 
@@ -231,7 +324,7 @@ export function AdministrationQuestionsContent() {
       </header>
 
       <section className="bg-white dark:bg-neutral-800 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700 p-4 md:p-6">
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleCreateQuestion}>
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSaveQuestion}>
           <label className="flex flex-col gap-2 md:col-span-2">
             <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Enunciado</span>
             <textarea
@@ -379,13 +472,23 @@ export function AdministrationQuestionsContent() {
             <p className="md:col-span-2 text-sm text-emerald-600 dark:text-emerald-300 font-semibold">{submitSuccess}</p>
           )}
 
-          <div className="md:col-span-2 flex justify-end">
+          <div className="md:col-span-2 flex gap-3 justify-end">
+            {editingQuestionId && (
+              <button
+                type="button"
+                onClick={handleCancelEditing}
+                disabled={isSubmitting || loadingEditingQuestion}
+                className="px-5 py-3 rounded-full bg-neutral-300 dark:bg-neutral-600 text-neutral-900 dark:text-white font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                Cancelar
+              </button>
+            )}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingEditingQuestion}
               className="px-5 py-3 rounded-full bg-neutral-900 dark:bg-blue-500 text-white font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Salvando..." : "Salvar questão"}
+              {isSubmitting ? "Salvando..." : editingQuestionId ? "Editar questão" : "Salvar questão"}
             </button>
           </div>
         </form>
@@ -463,15 +566,19 @@ export function AdministrationQuestionsContent() {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#D4EAFC] dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 hover:opacity-90 transition-opacity"
+                        onClick={() => handleLoadQuestionForEditing(question.id)}
+                        disabled={loadingEditingQuestion || deletingQuestionId === question.id}
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#D4EAFC] dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        Editar
+                        {loadingEditingQuestion && editingQuestionId === question.id ? "Carregando..." : "Editar"}
                       </button>
                       <button
                         type="button"
-                        className="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 hover:opacity-90 transition-opacity"
+                        onClick={() => handleDeleteQuestion(question.id)}
+                        disabled={isSubmitting || deletingQuestionId === question.id}
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        Excluir
+                        {deletingQuestionId === question.id ? "Deletando..." : "Excluir"}
                       </button>
                     </div>
                   </td>
