@@ -48,12 +48,21 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 
 ## ✨ Features
 
-- 🔐 **Complete Authentication Flow**
-  - User login
-  - User registration
-  - Password recovery
+- 🔐 **Complete Authentication Flow with API Integration**
+  - User login with email and password
+  - User registration with first name, last name, and password confirmation
+  - Password recovery via email
+  - Password reset with token and email validation
+  - API integration with Laravel backend (X-API-KEY header support)
+  - Session management with 7-day expiration
+  - Automatic session validation and cleanup
+  - Logout functionality with session clearing
 
-- 🏠 **Learning Dashboard (Home)**
+- 🛡️ **Route Protection**
+  - Protected routes for authenticated users only
+  - Public routes restricted to unauthenticated users
+  - Automatic redirect based on authentication status
+  - Session expiration handling
   - Study modules overview
   - Current streak highlight
   - Daily challenges with progress bars and XP badges
@@ -138,26 +147,34 @@ f-port-go/
 │   │   ├── NameInput.tsx
 │   │   ├── PasswordInput.tsx
 │   │   ├── LeftPanel.tsx
+│   │   ├── AppLeftSidebar.tsx
+│   │   ├── ProtectedRoute.tsx       # Route protection for authenticated users
+│   │   ├── PublicRoute.tsx          # Route protection for unauthenticated users
 │   │   └── index.ts
+│   ├── services/                    # API and business logic services
+│   │   ├── auth.ts                  # Authentication API calls (login, register, forgot, reset)
+│   │   └── session.ts               # Session management with expiration tracking
 │   └── pages/                       # Page components
 │       ├── Login/
 │       │   ├── index.tsx
 │       │   └── components/
-│       │       ├── LoginContainer.tsx
 │       │       ├── LoginForm.tsx
-│       │       └── LoginLeftPanel.tsx
+│       │       └── index.ts
 │       ├── Register/
 │       │   ├── index.tsx
 │       │   └── components/
-│       │       ├── RegisterContainer.tsx
 │       │       ├── RegisterForm.tsx
-│       │       └── RegisterLeftPanel.tsx
-│       └── ForgotPassword/
-│           ├── index.tsx
-│           └── components/
-│               ├── ForgotPasswordContainer.tsx
-│               ├── ForgotPasswordForm.tsx
-│               └── ForgotPasswordLeftPanel.tsx
+│       │       └── index.ts
+│       ├── ForgotPassword/
+│       │   ├── index.tsx
+│       │   └── components/
+│       │       ├── ForgotPasswordForm.tsx
+│       │       └── index.ts
+│       ├── ResetPassword/
+│       │   ├── index.tsx
+│       │   └── components/
+│       │       ├── ResetPasswordForm.tsx
+│       │       └── index.ts
 │       └── Home/
 │           ├── index.tsx
 │           └── components/
@@ -252,39 +269,98 @@ npm run dev
 
 ### Routes
 
-- `/login` - Login page
-- `/register` - Registration page
-- `/forgot-password` - Password recovery page
-- `/` - Home dashboard page
-- `/store` - Store page
-- `/ranking` - Ranking page
-- `/calendar` - Calendar page
-- `/questionnaire` - Questionnaire page
-- `/settings` - Settings page
+- `/login` - Login page (public route)
+- `/register` - Registration page (public route)
+- `/forgot-password` - Password recovery page (public route)
+- `/reset-password` - Password reset page with token validation (public route)
+- `/` - Home dashboard page (protected route)
+- `/store` - Store page (protected route)
+- `/ranking` - Ranking page (protected route)
+- `/calendar` - Calendar page (protected route)
+- `/questionnaire` - Questionnaire page (protected route)
+- `/settings` - Settings page (protected route)
 
 ### Components
 
 #### Shared Components
 
 - **EmailInput** - Reusable email input with validation
-- **PasswordInput** - Password input with show/hide toggle
-- **NameInput** - Name input component
+- **PasswordInput** - Password input with show/hide toggle and optional custom label
+- **NameInput** - Name input component with optional custom label
 - **DarkModeToggle** - Theme switcher component
 - **BrowserHeader** - Mock browser chrome header
 - **LeftPanel** - Decorative panel for authentication pages
+- **AppLeftSidebar** - Navigation sidebar with logout functionality
+- **ProtectedRoute** - Route wrapper for authenticated users only (redirects to `/login` if unauthenticated)
+- **PublicRoute** - Route wrapper for unauthenticated users only (redirects to `/` if authenticated)
 
 #### Page Components
 
 Pages follow modular structures depending on the section:
-- **Authentication pages** (`/login`, `/register`, `/forgot-password`)
-  - **Container** - Layout wrapper
-  - **Form** - Form logic and submission
-  - **LeftPanel** - Decorative panel for auth branding
+
+- **Authentication pages** (`/login`, `/register`, `/forgot-password`, `/reset-password`)
+  - Index component - Layout wrapper with form state management
+  - Form component - Form logic, validation, and API submission
+  - LeftPanel - Decorative panel for auth branding
+  - Error/success messaging with visual feedback
+  - Loading states on form submission
+
 - **App pages** (`/`, `/store`, `/ranking`, `/calendar`, `/questionnaire`, `/settings`)
-  - **Container** - Browser-frame wrapper
-  - **LeftSidebar** - Navigation and profile actions
-  - **MainContent** - Core page content
-  - **RightPanel** - Contextual summary cards and quick info
+  - Index component - Browser-frame wrapper and page state management
+  - LeftSidebar - Navigation with profile and logout actions
+  - MainContent - Core page content
+  - RightPanel - Contextual summary cards and quick info
+
+## 🔌 API Configuration
+
+The application integrates with a Laravel backend API running on `http://localhost:8000/api`. All authentication requests include the required `X-API-KEY` header for validation.
+
+### Authentication Endpoints
+
+- **POST** `/login` - User login
+  - Request: `{ email: string, password: string }`
+  - Response: `{ message: string, uuid: string, email: string, token: string }`
+
+- **POST** `/register` - User registration
+  - Request: `{ first_name: string, last_name: string, email: string, password: string, password_confirmation: string }`
+  - Response: `{ message: string }`
+
+- **POST** `/forgot-password` - Request password reset token
+  - Request: `{ email: string }`
+  - Response: `{ message: string }`
+
+- **POST** `/reset-password` - Reset password with token
+  - Request: `{ token: string, email: string, password: string }`
+  - Response: `{ message: string }`
+
+### Session Management
+
+Sessions are stored in `sessionStorage` with automatic expiration after 7 days. The session includes:
+- `uuid` - User unique identifier
+- `email` - User email address
+- `token` - Authentication token for API requests
+
+Session validation occurs on every app initialization and when accessing protected routes.
+
+### Services
+
+Services handle API communication and business logic:
+
+- **auth.ts** - Authentication API service
+  - `login(payload)` - Authenticate user and return session data
+  - `register(payload)` - Create new user account
+  - `forgotPassword(payload)` - Request password reset token
+  - `resetPassword(payload)` - Reset password with token
+  - Centralized API error handling with validation message extraction
+  - X-API-KEY header injection for all requests
+
+- **session.ts** - Session management service
+  - `saveSession(session)` - Store user session with 7-day expiration
+  - `getSession()` - Retrieve valid session or null if expired
+  - `isSessionValid()` - Check if user has active session
+  - `clearSession()` - Remove session data (logout)
+  - `getSessionToken()` - Get authentication token from session
+  - Automatic expiration validation and cleanup
 
 ## 🎨 Styling
 

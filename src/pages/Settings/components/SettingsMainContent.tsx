@@ -213,18 +213,6 @@ export function SettingsMainContent() {
           </div>
         </section>
 
-        <section className="mt-8">
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Sobre você</span>
-            <textarea
-              id="about"
-              defaultValue="Sou estudante do 3º ano e gosto de aprender programação e inglês no PortGO."
-              rows={4}
-              className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            />
-          </label>
-        </section>
-
         <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
           <button
             type="button"

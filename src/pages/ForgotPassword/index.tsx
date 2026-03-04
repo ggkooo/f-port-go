@@ -3,11 +3,39 @@ import {
   ForgotPasswordForm,
 } from "./components";
 import { BrowserHeader, DarkModeToggle, LeftPanel, PageContainer } from "../../components";
+import { forgotPassword } from "../../services/auth";
 
 function ForgotPassword() {
-  const handleForgotPasswordSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Form submitted", e);
-    // TODO: Implementar lógica de recuperação de senha
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+
+  const handleForgotPasswordSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const email = String(formData.get("email") || "").trim();
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setIsSubmitting(true);
+
+    try {
+      const response = await forgotPassword({ email });
+      setSuccessMessage(
+        response.message || "Se o e-mail existir, enviaremos um link de redefinição.",
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar o link de recuperação.";
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,7 +70,12 @@ function ForgotPassword() {
               cardTitle="Tudo sob controle!"
               cardDescription="Sua conta e progresso estão seguros conosco."
             />
-            <ForgotPasswordForm onSubmit={handleForgotPasswordSubmit} />
+            <ForgotPasswordForm
+              onSubmit={handleForgotPasswordSubmit}
+              isSubmitting={isSubmitting}
+              errorMessage={errorMessage}
+              successMessage={successMessage}
+            />
           </div>
         </PageContainer>
       </div>

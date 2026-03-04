@@ -6,3 +6,5 @@ export { NameInput } from "./NameInput";
 export { LeftPanel } from "./LeftPanel";
 export { PageContainer } from "./PageContainer";
 export { AppLeftSidebar } from "./AppLeftSidebar";
+export { ProtectedRoute } from "./ProtectedRoute";
+export { PublicRoute } from "./PublicRoute";

@@ -1,16 +1,17 @@
 interface NameInputProps {
   id: string;
   placeholder: string;
+  label?: string;
 }
 
-export function NameInput({ id, placeholder }: NameInputProps) {
+export function NameInput({ id, placeholder, label = "Nome Completo" }: NameInputProps) {
   return (
     <div className="group">
       <label
         htmlFor={id}
         className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2.5 ml-1 transition-colors group-focus-within:text-blue-600"
       >
-        Nome Completo
+        {label}
       </label>
       <input
         id={id}
