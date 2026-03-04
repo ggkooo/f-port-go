@@ -3,7 +3,7 @@ import {
   ForgotPasswordForm,
 } from "./components";
 import { BrowserHeader, DarkModeToggle, LeftPanel, PageContainer } from "../../components";
-import { forgotPassword } from "../../services/auth";
+import { forgotPassword } from "../../services/authService";
 
 function ForgotPassword() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
