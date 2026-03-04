@@ -11,6 +11,10 @@ import {
 import { getProfile } from "../../services/profileService";
 import { getSession } from "../../services/session";
 import {
+  getAndStoreTodayChallenges,
+  syncChallengeProgressFromSession,
+} from "../../services/challengeService";
+import {
   HELP_ACTIONS,
   OPTION_STYLE_BY_INDEX,
   getDifficultyMeta,
@@ -84,7 +88,12 @@ function Questionnaire() {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [storedBestStreak, setStoredBestStreak] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [quizStartedAtMs, setQuizStartedAtMs] = useState<number | null>(null);
+  const [challengeSyncStatus, setChallengeSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
+  const [challengeSyncError, setChallengeSyncError] = useState<string | null>(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const isQuizInProgress = hasStartedQuiz && !isQuizFinished;
 
   const selectedDifficultyData = difficultyOptions.find((option) => option.key === selectedDifficulty);
   const selectedActivityType = useMemo(
@@ -134,6 +143,10 @@ function Questionnaire() {
 
   const streakStorageKey = useMemo(
     () => `portgo.quiz.bestStreak.activityType.${selectedActivityTypeId ?? "unknown"}`,
+    [selectedActivityTypeId],
+  );
+  const metricsStorageKey = useMemo(
+    () => `portgo.quiz.sessionMetrics.activityType.${selectedActivityTypeId ?? "unknown"}`,
     [selectedActivityTypeId],
   );
 
@@ -273,6 +286,83 @@ function Questionnaire() {
     }
   }, [bestStreak, storedBestStreak, streakStorageKey]);
 
+  useEffect(() => {
+    const session = getSession();
+
+    if (!session?.uuid || !session.token) {
+      return;
+    }
+
+    getAndStoreTodayChallenges(session.uuid, session.token).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (!hasStartedQuiz || isQuizFinished || quizStartedAtMs === null) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      const nextElapsedSeconds = Math.max(0, Math.floor((Date.now() - quizStartedAtMs) / 1000));
+      setElapsedSeconds(nextElapsedSeconds);
+    }, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [hasStartedQuiz, isQuizFinished, quizStartedAtMs]);
+
+  useEffect(() => {
+    if (!isQuizFinished || challengeSyncStatus !== "idle") {
+      return;
+    }
+
+    const session = getSession();
+    if (!session?.uuid || !session.token) {
+      return;
+    }
+
+    const elapsedMinutesRounded = Math.max(0, Math.round(elapsedSeconds / 60));
+    const consecutiveCorrectAnswers = Math.max(0, Math.round(bestStreak));
+    const sessionMetrics = {
+      elapsedMinutesRounded,
+      completedLessons: 1,
+      consecutiveCorrectAnswers,
+    };
+
+    window.localStorage.setItem(metricsStorageKey, JSON.stringify(sessionMetrics));
+    setChallengeSyncStatus("syncing");
+    setChallengeSyncError(null);
+
+    syncChallengeProgressFromSession(session.uuid, session.token, sessionMetrics)
+      .then(() => {
+        setChallengeSyncStatus("success");
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : "Não foi possível atualizar os desafios do dia.";
+        setChallengeSyncStatus("error");
+        setChallengeSyncError(message);
+      });
+  }, [bestStreak, challengeSyncStatus, elapsedSeconds, isQuizFinished, metricsStorageKey]);
+
+  useEffect(() => {
+    if (!isQuizInProgress) {
+      return;
+    }
+
+    const currentUrl = window.location.href;
+    window.history.pushState({ questionnaireLocked: true }, "", currentUrl);
+
+    const handlePopState = () => {
+      window.history.pushState({ questionnaireLocked: true }, "", currentUrl);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [isQuizInProgress]);
+
   const resetQuizState = () => {
     setHasStartedQuiz(false);
     setQuizQuestions([]);
@@ -289,6 +379,10 @@ function Questionnaire() {
     setHiddenOptionsByQuestionId({});
     setCurrentStreak(0);
     setBestStreak(0);
+    setElapsedSeconds(0);
+    setQuizStartedAtMs(null);
+    setChallengeSyncStatus("idle");
+    setChallengeSyncError(null);
     setIsQuizFinished(false);
   };
 
@@ -350,6 +444,10 @@ function Questionnaire() {
         setHiddenOptionsByQuestionId({});
         setCurrentStreak(0);
         setBestStreak(0);
+        setElapsedSeconds(0);
+        setQuizStartedAtMs(Date.now());
+        setChallengeSyncStatus("idle");
+        setChallengeSyncError(null);
         setIsQuizFinished(false);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Não foi possível carregar as questões.";
@@ -373,6 +471,9 @@ function Questionnaire() {
         setCurrentQuestionPointer(0);
         setRetryRoundNumber((previousValue) => previousValue + 1);
       } else {
+        if (quizStartedAtMs !== null) {
+          setElapsedSeconds(Math.max(0, Math.floor((Date.now() - quizStartedAtMs) / 1000)));
+        }
         setHasStartedQuiz(false);
         setIsQuizFinished(true);
       }
@@ -456,13 +557,31 @@ function Questionnaire() {
     advanceQuestionFlow(nextRetryList);
   };
 
+  const handleExitQuestionnaire = () => {
+    if (!isQuizInProgress) {
+      navigate("/");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Tem certeza que deseja desistir da lição? O progresso desta sessão não será contabilizado nos desafios.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    resetQuizState();
+    navigate("/");
+  };
+
   return (
     <div className="h-screen w-screen overflow-hidden flex items-center justify-center px-0 pt-0 pb-0 sm:px-2 sm:pt-2 sm:pb-0 md:px-4 md:pt-4 md:pb-0 lg:p-4">
       <PageContainer>
         <BrowserHeader />
 
         <div className="flex flex-1 min-h-0 bg-[#F0F4F8] dark:bg-neutral-950 overflow-hidden">
-          <AppLeftSidebar />
+          <AppLeftSidebar navigationLocked={isQuizInProgress} />
 
           <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 flex flex-col overflow-hidden">
             <header className="mb-6 flex items-start sm:items-center justify-between gap-4 flex-wrap">
@@ -480,10 +599,10 @@ function Questionnaire() {
 
               <button
                 type="button"
-                onClick={() => navigate("/")}
+                onClick={handleExitQuestionnaire}
                 className="px-4 py-2 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm font-semibold text-neutral-700 dark:text-neutral-200"
               >
-                Voltar
+                {isQuizInProgress ? "Desistir" : "Voltar"}
               </button>
             </header>
 
@@ -588,6 +707,7 @@ function Questionnaire() {
                   currentQuestionPointer={currentQuestionPointer}
                   currentRoundLength={currentRoundQuestions.length}
                   currentStreak={currentStreak}
+                  elapsedSeconds={elapsedSeconds}
                   progressPercentage={progressPercentage}
                   lastAnswerResult={lastAnswerResult}
                   helpMessage={helpMessage}
@@ -606,7 +726,24 @@ function Questionnaire() {
               )}
 
               {selectedGrade && selectedDifficulty && selectedDifficultyData && isQuizFinished && (
-                <FinishedStep earnedXp={earnedXp} bestStreak={bestStreak} onBackHome={() => navigate("/")} />
+                <>
+                  <FinishedStep earnedXp={earnedXp} bestStreak={bestStreak} onBackHome={() => navigate("/")} />
+                  {challengeSyncStatus === "syncing" && (
+                    <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300 mt-3">
+                      Atualizando progresso dos desafios do dia...
+                    </p>
+                  )}
+                  {challengeSyncStatus === "success" && (
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 mt-3">
+                      Progresso dos desafios atualizado com sucesso.
+                    </p>
+                  )}
+                  {challengeSyncStatus === "error" && (
+                    <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mt-3">
+                      {challengeSyncError ?? "Não foi possível atualizar os desafios do dia."}
+                    </p>
+                  )}
+                </>
               )}
             </section>
           </main>

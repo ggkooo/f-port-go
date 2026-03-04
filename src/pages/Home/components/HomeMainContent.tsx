@@ -4,6 +4,8 @@ import {
   getActivityTypes,
   type ActivityTypeOption,
 } from "../../../services/catalogService";
+import { getSession } from "../../../services/session";
+import { getAndStoreTodayChallenges, type UserChallenge } from "../../../services/challengeService";
 
 type ActivityModuleStyle = {
   icon: string;
@@ -16,6 +18,58 @@ const DEFAULT_ACTIVITY_TYPE_MODULES: ActivityTypeOption[] = [
   { id: 1, name: "Gramática", slug: "gramatica" },
   { id: 2, name: "Interpretação Textual", slug: "interpretacao-textual" },
 ];
+
+type ChallengeCardStyle = {
+  containerClass: string;
+  textClass: string;
+  subTextClass: string;
+  progressClass: string;
+};
+
+const CHALLENGE_CARD_STYLES: ChallengeCardStyle[] = [
+  {
+    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
+    textClass: "text-blue-900 dark:text-blue-100",
+    subTextClass: "text-blue-700 dark:text-blue-200",
+    progressClass: "bg-blue-500 dark:bg-blue-400",
+  },
+  {
+    containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
+    textClass: "text-emerald-900 dark:text-emerald-100",
+    subTextClass: "text-emerald-700 dark:text-emerald-200",
+    progressClass: "bg-emerald-500 dark:bg-emerald-400",
+  },
+  {
+    containerClass: "bg-[#FDE68A] dark:bg-amber-900/30",
+    textClass: "text-amber-900 dark:text-amber-100",
+    subTextClass: "text-amber-700 dark:text-amber-200",
+    progressClass: "bg-amber-500 dark:bg-amber-400",
+  },
+];
+
+function getChallengeUnitLabel(unit: string, targetValue: number): string {
+  if (unit === "minutes") {
+    return "min";
+  }
+
+  if (unit === "lessons") {
+    return targetValue === 1 ? "lição" : "lições";
+  }
+
+  if (unit === "streak_exercises") {
+    return targetValue === 1 ? "exercício" : "exercícios";
+  }
+
+  return unit;
+}
+
+function getChallengeProgress(challenge: UserChallenge): number {
+  if (challenge.target_value <= 0) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, (challenge.current_value / challenge.target_value) * 100));
+}
 
 function getActivityModuleStyle(slug: string): ActivityModuleStyle {
   if (slug === "gramatica") {
@@ -44,43 +98,12 @@ function getActivityModuleStyle(slug: string): ActivityModuleStyle {
   };
 }
 
-const dailyChallenges = [
-  {
-    title: "Estude por 15 minutos",
-    progress: 60,
-    progressLabel: "9/15 min",
-    xpLabel: "50XP",
-    containerClass: "bg-[#D4EAFC] dark:bg-blue-900/30",
-    textClass: "text-blue-900 dark:text-blue-100",
-    subTextClass: "text-blue-700 dark:text-blue-200",
-    progressClass: "bg-blue-500 dark:bg-blue-400",
-  },
-  {
-    title: "Faça 3 lições",
-    progress: 33,
-    progressLabel: "1/3 lições",
-    xpLabel: "50XP",
-    containerClass: "bg-[#A3E4A1]/60 dark:bg-emerald-900/30",
-    textClass: "text-emerald-900 dark:text-emerald-100",
-    subTextClass: "text-emerald-700 dark:text-emerald-200",
-    progressClass: "bg-emerald-500 dark:bg-emerald-400",
-  },
-  {
-    title: "Acerte 5 exercícios seguidos em 2 lições",
-    progress: 50,
-    progressLabel: "1/2 lições",
-    xpLabel: "70XP",
-    containerClass: "bg-[#FDE68A] dark:bg-amber-900/30",
-    textClass: "text-amber-900 dark:text-amber-100",
-    subTextClass: "text-amber-700 dark:text-amber-200",
-    progressClass: "bg-amber-500 dark:bg-amber-400",
-  },
-];
-
 export function HomeMainContent() {
   const navigate = useNavigate();
   const [activityTypes, setActivityTypes] = useState<ActivityTypeOption[]>([]);
   const [loadingActivityTypes, setLoadingActivityTypes] = useState(false);
+  const [dailyChallenges, setDailyChallenges] = useState<UserChallenge[]>([]);
+  const [loadingChallenges, setLoadingChallenges] = useState(false);
 
   useEffect(() => {
     const fetchActivityTypes = async () => {
@@ -97,6 +120,31 @@ export function HomeMainContent() {
     };
 
     fetchActivityTypes();
+  }, []);
+
+  useEffect(() => {
+    const fetchDailyChallenges = async () => {
+      const session = getSession();
+
+      if (!session?.uuid || !session.token) {
+        setDailyChallenges([]);
+        return;
+      }
+
+      setLoadingChallenges(true);
+
+      try {
+        const response = await getAndStoreTodayChallenges(session.uuid, session.token);
+        const sortedChallenges = [...response.challenges].sort((a, b) => a.position - b.position);
+        setDailyChallenges(sortedChallenges);
+      } catch {
+        setDailyChallenges([]);
+      } finally {
+        setLoadingChallenges(false);
+      }
+    };
+
+    fetchDailyChallenges();
   }, []);
 
   const studyModules = useMemo(() => {
@@ -169,33 +217,63 @@ export function HomeMainContent() {
           </div>
 
           <ul className="space-y-3">
-            {dailyChallenges.map((challenge) => (
-              <li
-                key={challenge.title}
-                className={`${challenge.containerClass} rounded-2xl px-4 py-3`}
-              >
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <p className={`text-sm md:text-base ${challenge.textClass} font-semibold leading-snug`}>
-                    {challenge.title}
-                  </p>
-                  <div className="flex items-center gap-2 whitespace-nowrap">
-                    <span className={`text-[11px] md:text-xs ${challenge.subTextClass} font-bold`}>
-                      {challenge.progressLabel}
-                    </span>
-                    <span className="text-[10px] md:text-xs font-extrabold px-2 py-1 rounded-full bg-white/80 dark:bg-neutral-600 text-neutral-800 dark:text-neutral-100">
-                      {challenge.xpLabel}
-                    </span>
-                  </div>
-                </div>
+            {dailyChallenges.map((challenge, index) => {
+              const cardStyle =
+                CHALLENGE_CARD_STYLES[index] ?? {
+                  containerClass: "bg-neutral-100 dark:bg-neutral-700",
+                  textClass: "text-neutral-900 dark:text-neutral-100",
+                  subTextClass: "text-neutral-600 dark:text-neutral-300",
+                  progressClass: "bg-neutral-500 dark:bg-neutral-400",
+                };
 
-                <div className="w-full h-2 rounded-full bg-white/80 dark:bg-neutral-600 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${challenge.progressClass}`}
-                    style={{ width: `${challenge.progress}%` }}
-                  />
-                </div>
+              const progress = getChallengeProgress(challenge);
+              const progressLabel = `${challenge.current_value}/${challenge.target_value} ${getChallengeUnitLabel(
+                challenge.unit,
+                challenge.target_value,
+              )}`;
+
+              return (
+                <li
+                  key={challenge.id}
+                  className={`${cardStyle.containerClass} rounded-2xl px-4 py-3`}
+                >
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <p className={`text-sm md:text-base ${cardStyle.textClass} font-semibold leading-snug`}>
+                      {challenge.challenge_name}
+                    </p>
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      <span className={`text-[11px] md:text-xs ${cardStyle.subTextClass} font-bold`}>
+                        {progressLabel}
+                      </span>
+                      <span className="text-[10px] md:text-xs font-extrabold px-2 py-1 rounded-full bg-white/80 dark:bg-neutral-600 text-neutral-800 dark:text-neutral-100">
+                        {challenge.xp_reward}XP
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="w-full h-2 rounded-full bg-white/80 dark:bg-neutral-600 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${cardStyle.progressClass}`}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+            {!loadingChallenges && dailyChallenges.length === 0 && (
+              <li className="rounded-2xl px-4 py-3 bg-neutral-100 dark:bg-neutral-700">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                  Nenhum desafio disponível para hoje.
+                </p>
               </li>
-            ))}
+            )}
+            {loadingChallenges && (
+              <li className="rounded-2xl px-4 py-3 bg-neutral-100 dark:bg-neutral-700">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                  Carregando desafios...
+                </p>
+              </li>
+            )}
           </ul>
         </div>
       </div>

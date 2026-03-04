@@ -7,6 +7,7 @@ type AppRoute = "/" | "/store" | "/ranking" | "/calendar" | "/settings";
 interface AppLeftSidebarProps {
   activePath?: AppRoute;
   showStoreNotification?: boolean;
+  navigationLocked?: boolean;
 }
 
 const navItems: Array<{ icon: string; path: AppRoute }> = [
@@ -47,7 +48,11 @@ function getPastelColor(seed: string): string {
   return pastelPalette[total % pastelPalette.length];
 }
 
-export function AppLeftSidebar({ activePath, showStoreNotification = false }: AppLeftSidebarProps) {
+export function AppLeftSidebar({
+  activePath,
+  showStoreNotification = false,
+  navigationLocked = false,
+}: AppLeftSidebarProps) {
   const navigate = useNavigate();
   const session = getSession();
   const avatarSeed = getInitialSeed(session?.firstName, session?.email);
@@ -76,11 +81,12 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
                 key={icon}
                 type="button"
                 onClick={() => navigate(path)}
+                disabled={navigationLocked}
                 className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm relative transition-colors ${
                   isActive
                     ? "bg-neutral-900 dark:bg-blue-500 text-white"
                     : "bg-white dark:bg-neutral-700 text-neutral-500"
-                }`}
+                } ${navigationLocked ? "opacity-60 cursor-not-allowed" : ""}`}
               >
                 <span className="material-symbols-outlined">{icon}</span>
                 {hasNotification && (
@@ -97,7 +103,10 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
           <button
             type="button"
             onClick={() => navigate("/settings")}
-            className="w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-neutral-500 shadow-sm"
+            disabled={navigationLocked}
+            className={`w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-neutral-500 shadow-sm ${
+              navigationLocked ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           >
             <span className="material-symbols-outlined">settings</span>
           </button>
@@ -105,7 +114,12 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
           <button
             type="button"
             onClick={handleLogout}
-            className="w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-red-500 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            disabled={navigationLocked}
+            className={`w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-red-500 shadow-sm transition-colors ${
+              navigationLocked
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-red-50 dark:hover:bg-red-900/20"
+            }`}
             title="Logout"
           >
             <span className="material-symbols-outlined">logout</span>
@@ -132,11 +146,12 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
                 key={`${icon}-mobile`}
                 type="button"
                 onClick={() => navigate(path)}
+                disabled={navigationLocked}
                 className={`w-11 h-11 rounded-full flex items-center justify-center relative transition-colors ${
                   isActive
                     ? "bg-neutral-900 dark:bg-blue-500 text-white"
                     : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300"
-                }`}
+                } ${navigationLocked ? "opacity-60 cursor-not-allowed" : ""}`}
               >
                 <span className="material-symbols-outlined text-[20px]">{icon}</span>
                 {hasNotification && (
@@ -149,11 +164,12 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
           <button
             type="button"
             onClick={() => navigate("/settings")}
+            disabled={navigationLocked}
             className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
               activePath === "/settings"
                 ? "bg-neutral-900 dark:bg-blue-500 text-white"
                 : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300"
-            }`}
+            } ${navigationLocked ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             <span className="material-symbols-outlined text-[20px]">settings</span>
           </button>
@@ -161,7 +177,12 @@ export function AppLeftSidebar({ activePath, showStoreNotification = false }: Ap
           <button
             type="button"
             onClick={handleLogout}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+            disabled={navigationLocked}
+            className={`w-11 h-11 rounded-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-red-500 transition-colors ${
+              navigationLocked
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-red-50 dark:hover:bg-red-900/20"
+            }`}
             title="Logout"
           >
             <span className="material-symbols-outlined text-[20px]">logout</span>
