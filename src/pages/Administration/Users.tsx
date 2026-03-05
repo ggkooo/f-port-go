@@ -1,14 +1,9 @@
 import {
-  AdministrationLayout,
   AdministrationUsersContent,
 } from "./components";
 
 function AdministrationUsers() {
-  return (
-    <AdministrationLayout activePath="/administration/users">
-      <AdministrationUsersContent />
-    </AdministrationLayout>
-  );
+  return <AdministrationUsersContent />;
 }
 
 export default AdministrationUsers;

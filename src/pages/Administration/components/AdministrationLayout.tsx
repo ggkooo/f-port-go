@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { BrowserHeader, PageContainer } from "../../../components";
-import { AdminLeftSidebar, type AdminRoute } from "./AdminLeftSidebar";
+import { AdminLeftSidebar } from "./AdminLeftSidebar";
 import { AdministrationRightPanel } from "./AdministrationRightPanel";
+import type { AdminRoute } from "../routes";
 
 interface AdministrationLayoutProps {
   activePath: AdminRoute;

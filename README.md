@@ -31,6 +31,20 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 ### Settings Page
 ![Settings Page](README-images/settings-page.png)
 
+### Administration - Overview
+![Administration Overview](README-images/administration-page.png)
+
+### Administration - Questions Management
+![Administration Questions 01](README-images/administration-questions-page-01.png)
+![Administration Questions 02](README-images/administration-questions-page-02.png)
+
+### Administration - Challenges Management
+![Administration Challenges 01](README-images/administration-challenges-page-01.png)
+![Administration Challenges 02](README-images/administration-challenges-page-02.png)
+
+### Administration - Users Management
+![Administration Users](README-images/administration-users-page.png)
+
 ### Questionnaire - Step 1 (Grade Selection)
 ![Questionnaire Step 1](README-images/questionnaire-001.png)
 
@@ -61,11 +75,17 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 - 🛡️ **Route Protection**
   - Protected routes for authenticated users only
   - Public routes restricted to unauthenticated users
+  - Admin-only routes for administration modules
   - Automatic redirect based on authentication status
   - Session expiration handling
   - Study modules overview
   - Current streak highlight
   - Daily challenges with progress bars and XP badges
+
+- 🧭 **Centralized Routing Architecture**
+  - Route tree centralized in `src/routes/AppRouter.tsx`
+  - Path constants shared through `src/routes/paths.ts`
+  - Nested admin routing with shell + children (`/administration/*`)
 
 - 🛍️ **Store Page**
   - XP potion cards (1.5x, 2x, 2.5x, and 3x)
@@ -145,9 +165,12 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 ```
 f-port-go/
 ├── src/
-│   ├── App.tsx                      # Main app component with routing
+│   ├── App.tsx                      # Main app component
 │   ├── main.tsx                     # Application entry point
 │   ├── index.css                    # Global styles
+│   ├── routes/                      # Centralized route tree and path constants
+│   │   ├── AppRouter.tsx
+│   │   └── paths.ts
 │   ├── components/                  # Shared components
 │   │   ├── BrowserHeader.tsx
 │   │   ├── DarkModeToggle.tsx
@@ -158,9 +181,10 @@ f-port-go/
 │   │   ├── AppLeftSidebar.tsx
 │   │   ├── ProtectedRoute.tsx       # Route protection for authenticated users
 │   │   ├── PublicRoute.tsx          # Route protection for unauthenticated users
+│   │   ├── AdminRoute.tsx           # Route protection for admin users
 │   │   └── index.ts
 │   ├── services/                    # API and business logic services
-│   │   ├── auth.ts                  # Authentication API calls (login, register, forgot, reset)
+│   │   ├── authService.ts           # Authentication API calls (login, register, forgot, reset)
 │   │   └── session.ts               # Session management with expiration tracking
 │   └── pages/                       # Page components
 │       ├── Login/
@@ -231,6 +255,21 @@ f-port-go/
 │               ├── ReadyStep.tsx
 │               ├── StepIndicator.tsx
 │               └── index.ts
+│       └── Administration/
+│           ├── index.tsx
+│           ├── Questions.tsx
+│           ├── Challenges.tsx
+│           ├── Users.tsx
+│           ├── AdministrationShell.tsx
+│           ├── routes.ts
+│           └── components/
+│               ├── AdministrationLayout.tsx
+│               ├── AdminLeftSidebar.tsx
+│               ├── AdministrationMainContent.tsx
+│               ├── AdministrationQuestionsContent.tsx
+│               ├── AdministrationChallengesContent.tsx
+│               ├── AdministrationUsersContent.tsx
+│               └── index.ts
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation
 ├── package.json
@@ -287,6 +326,10 @@ npm run dev
 - `/calendar` - Calendar page (protected route)
 - `/questionnaire` - Questionnaire page (protected route)
 - `/settings` - Settings page (protected route)
+- `/administration` - Administration dashboard (admin route)
+- `/administration/questions` - Questions management (admin route)
+- `/administration/challenges` - Challenges management (admin route)
+- `/administration/users` - Users management (admin route)
 
 ### Components
 
@@ -301,6 +344,7 @@ npm run dev
 - **AppLeftSidebar** - Navigation sidebar with logout functionality
 - **ProtectedRoute** - Route wrapper for authenticated users only (redirects to `/login` if unauthenticated)
 - **PublicRoute** - Route wrapper for unauthenticated users only (redirects to `/` if authenticated)
+- **AdminRoute** - Route wrapper for admin-only access to administration routes
 
 #### Page Components
 

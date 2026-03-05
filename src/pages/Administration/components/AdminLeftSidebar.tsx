@@ -1,23 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { DarkModeToggle } from "../../../components";
 import { clearSession, getSession } from "../../../services/session";
-
-export type AdminRoute =
-  | "/administration"
-  | "/administration/questions"
-  | "/administration/challenges"
-  | "/administration/users";
+import { ADMIN_NAV_ITEMS, type AdminRoute } from "../routes";
 
 interface AdminLeftSidebarProps {
   activePath: AdminRoute;
 }
-
-const navItems: Array<{ icon: string; path: AdminRoute; label: string }> = [
-  { icon: "space_dashboard", path: "/administration", label: "Painel" },
-  { icon: "quiz", path: "/administration/questions", label: "Questões" },
-  { icon: "sports_score", path: "/administration/challenges", label: "Desafios" },
-  { icon: "groups", path: "/administration/users", label: "Usuários" },
-];
 
 const pastelPalette = [
   "#FADADD",
@@ -70,7 +58,7 @@ export function AdminLeftSidebar({ activePath }: AdminLeftSidebarProps) {
         </div>
 
         <nav className="flex flex-col gap-4 flex-1">
-          {navItems.map(({ icon, path, label }) => {
+          {ADMIN_NAV_ITEMS.map(({ icon, path, label }) => {
             const isActive = activePath === path;
 
             return (
@@ -115,7 +103,7 @@ export function AdminLeftSidebar({ activePath }: AdminLeftSidebarProps) {
 
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-neutral-200 dark:border-neutral-700 bg-white/95 dark:bg-neutral-900/95 backdrop-blur px-2 py-2">
         <div className="flex items-center justify-between max-w-md mx-auto">
-          {navItems.map(({ icon, path, label }) => {
+          {ADMIN_NAV_ITEMS.map(({ icon, path, label }) => {
             const isActive = activePath === path;
 
             return (

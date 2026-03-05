@@ -1,14 +1,9 @@
 import {
-  AdministrationLayout,
   AdministrationQuestionsContent,
 } from "./components";
 
 function AdministrationQuestions() {
-  return (
-    <AdministrationLayout activePath="/administration/questions">
-      <AdministrationQuestionsContent />
-    </AdministrationLayout>
-  );
+  return <AdministrationQuestionsContent />;
 }
 
 export default AdministrationQuestions;

@@ -1,14 +1,9 @@
 import {
-  AdministrationLayout,
   AdministrationMainContent,
 } from "./components";
 
 function Administration() {
-  return (
-    <AdministrationLayout activePath="/administration">
-      <AdministrationMainContent />
-    </AdministrationLayout>
-  );
+  return <AdministrationMainContent />;
 }
 
 export default Administration;
