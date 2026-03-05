@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from "react";
 import type { AnswerResult, HelpAction, OptionStyle, QuizQuestion } from "../types";
 
 interface HelpUsage {
@@ -51,8 +52,56 @@ export function QuizStep({
   onSelectOption,
   onAnswerAndContinue,
 }: QuizStepProps) {
+  const optionButtonRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+  const [uniformOptionHeight, setUniformOptionHeight] = useState<number | null>(null);
+
   const elapsedMinutes = Math.floor(elapsedSeconds / 60);
   const elapsedRemainingSeconds = elapsedSeconds % 60;
+
+  useLayoutEffect(() => {
+    let frameId = 0;
+
+    const recalculateUniformHeight = () => {
+      frameId = window.requestAnimationFrame(() => {
+        const visibleIndexes = currentQuestion.options
+          .map((_, index) => index)
+          .filter((index) => !hiddenOptionIndexes.includes(index));
+
+        if (visibleIndexes.length === 0) {
+          setUniformOptionHeight(null);
+          return;
+        }
+
+        const tallestOptionHeight = visibleIndexes.reduce((maxHeight, index) => {
+          const buttonElement = optionButtonRefs.current[index];
+
+          if (!buttonElement) {
+            return maxHeight;
+          }
+
+          return Math.max(maxHeight, Math.ceil(buttonElement.scrollHeight));
+        }, 0);
+
+        if (tallestOptionHeight <= 0) {
+          setUniformOptionHeight(null);
+          return;
+        }
+
+        setUniformOptionHeight((previousHeight) =>
+          previousHeight === tallestOptionHeight ? previousHeight : tallestOptionHeight,
+        );
+      });
+    };
+
+    setUniformOptionHeight(null);
+    recalculateUniformHeight();
+    window.addEventListener("resize", recalculateUniformHeight);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", recalculateUniformHeight);
+    };
+  }, [currentQuestion.id, currentQuestion.options, hiddenOptionIndexes]);
 
   const getHelpButtonProps = (key: HelpAction["key"]) => {
     const isUsed = helpUsage[key];
@@ -166,13 +215,19 @@ export function QuizStep({
               key={`${currentQuestion.id}-${optionText}`}
               type="button"
               onClick={() => onSelectOption(optionIndex)}
-              className={`${style.containerClass} h-20 md:h-24 px-5 flex items-center gap-4 rounded-2xl border-2 transition-all text-left ${
+              ref={(element) => {
+                optionButtonRefs.current[optionIndex] = element;
+              }}
+              style={uniformOptionHeight ? { height: `${uniformOptionHeight}px` } : undefined}
+              className={`${style.containerClass} px-5 py-4 flex items-center gap-4 rounded-2xl border-2 transition-all text-left ${
                 isSelected ? style.activeBorderClass : "border-transparent"
               }`}
             >
-              <div className={`w-7 h-7 rounded-full border-2 ${style.radioClass} bg-white flex items-center justify-center`}>
+              <div
+                className={`w-7 h-7 min-w-7 min-h-7 aspect-square shrink-0 rounded-full border-2 ${style.radioClass} bg-white flex items-center justify-center`}
+              >
                 <div
-                  className={`w-3.5 h-3.5 rounded-full ${style.dotClass} transition-opacity ${
+                  className={`w-3.5 h-3.5 min-w-3.5 min-h-3.5 aspect-square shrink-0 rounded-full ${style.dotClass} transition-opacity ${
                     isSelected ? "opacity-100" : "opacity-0"
                   }`}
                 />
