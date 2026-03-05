@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AppLeftSidebar, BrowserHeader, PageContainer } from "../../components";
+import { AppLeftSidebar, BrowserHeader, ConfirmationModal, PageContainer } from "../../components";
 import {
   getActivityTypes,
   getClasses,
@@ -94,6 +94,7 @@ function Questionnaire() {
   const [challengeSyncStatus, setChallengeSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
   const [challengeSyncError, setChallengeSyncError] = useState<string | null>(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [isExitConfirmationOpen, setIsExitConfirmationOpen] = useState(false);
   const isQuizInProgress = hasStartedQuiz && !isQuizFinished;
 
   const selectedDifficultyData = difficultyOptions.find((option) => option.key === selectedDifficulty);
@@ -566,14 +567,15 @@ function Questionnaire() {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Tem certeza que deseja desistir da lição? O progresso desta sessão não será contabilizado nos desafios.",
-    );
+    setIsExitConfirmationOpen(true);
+  };
 
-    if (!confirmed) {
-      return;
-    }
+  const handleCancelExitQuestionnaire = () => {
+    setIsExitConfirmationOpen(false);
+  };
 
+  const handleConfirmExitQuestionnaire = () => {
+    setIsExitConfirmationOpen(false);
     resetQuizState();
     navigate("/");
   };
@@ -767,6 +769,16 @@ function Questionnaire() {
             onUseSkipQuestion={handleUseSkipQuestion}
           />
         </div>
+
+        <ConfirmationModal
+          isOpen={isExitConfirmationOpen}
+          title="Desistir da lição?"
+          description="Se você sair agora, o progresso desta sessão não será contabilizado nos desafios."
+          confirmLabel="Desistir"
+          cancelLabel="Continuar"
+          onConfirm={handleConfirmExitQuestionnaire}
+          onCancel={handleCancelExitQuestionnaire}
+        />
       </PageContainer>
     </div>
   );
