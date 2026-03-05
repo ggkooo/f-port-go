@@ -1,21 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { clearSession, getSession } from "../services/session";
-
-type AppRoute = "/" | "/store" | "/ranking" | "/calendar" | "/administration" | "/settings";
+import { ROUTE_PATHS, type AppRoutePath } from "../routes/paths";
 
 interface AppLeftSidebarProps {
-  activePath?: AppRoute;
+  activePath?: AppRoutePath;
   showStoreNotification?: boolean;
   navigationLocked?: boolean;
 }
 
-const navItems: Array<{ icon: string; path: AppRoute }> = [
-  { icon: "home", path: "/" },
-  { icon: "shopping_basket", path: "/store" },
-  { icon: "leaderboard", path: "/ranking" },
-  { icon: "calendar_today", path: "/calendar" },
-  { icon: "admin_panel_settings", path: "/administration" },
+const navItems: Array<{ icon: string; path: AppRoutePath }> = [
+  { icon: "home", path: ROUTE_PATHS.HOME },
+  { icon: "shopping_basket", path: ROUTE_PATHS.STORE },
+  { icon: "leaderboard", path: ROUTE_PATHS.RANKING },
+  { icon: "calendar_today", path: ROUTE_PATHS.CALENDAR },
+  { icon: "admin_panel_settings", path: ROUTE_PATHS.ADMINISTRATION },
 ];
 
 const pastelPalette = [
@@ -58,14 +57,14 @@ export function AppLeftSidebar({
   const session = getSession();
   const visibleNavItems = session?.isAdmin
     ? navItems
-    : navItems.filter((item) => item.path !== "/administration");
+    : navItems.filter((item) => item.path !== ROUTE_PATHS.ADMINISTRATION);
   const avatarSeed = getInitialSeed(session?.firstName, session?.email);
   const avatarLetter = avatarSeed.charAt(0).toUpperCase();
   const avatarBackground = getPastelColor(avatarSeed);
 
   const handleLogout = () => {
     clearSession();
-    navigate("/login");
+    navigate(ROUTE_PATHS.LOGIN);
   };
 
   return (
@@ -106,7 +105,7 @@ export function AppLeftSidebar({
 
           <button
             type="button"
-            onClick={() => navigate("/settings")}
+            onClick={() => navigate(ROUTE_PATHS.SETTINGS)}
             disabled={navigationLocked}
             className={`w-12 h-12 rounded-full bg-white dark:bg-neutral-700 flex items-center justify-center text-neutral-500 shadow-sm ${
               navigationLocked ? "opacity-60 cursor-not-allowed" : ""
@@ -170,7 +169,7 @@ export function AppLeftSidebar({
             onClick={() => navigate("/settings")}
             disabled={navigationLocked}
             className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
-              activePath === "/settings"
+              activePath === ROUTE_PATHS.SETTINGS
                 ? "bg-neutral-900 dark:bg-blue-500 text-white"
                 : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300"
             } ${navigationLocked ? "opacity-60 cursor-not-allowed" : ""}`}

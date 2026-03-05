@@ -1,25 +1,26 @@
 import { useNavigate } from "react-router-dom";
+import { ROUTE_PATHS } from "../../../routes/paths";
 
 const adminModules = [
   {
     id: "questions",
     title: "Questões",
     description: "Cadastre e organize questões por turma, dificuldade e tipo.",
-    path: "/administration/questions",
+    path: ROUTE_PATHS.ADMINISTRATION_QUESTIONS,
     icon: "quiz",
   },
   {
     id: "challenges",
     title: "Desafios",
     description: "Gerencie metas diárias e recompensas para os estudantes.",
-    path: "/administration/challenges",
+    path: ROUTE_PATHS.ADMINISTRATION_CHALLENGES,
     icon: "sports_score",
   },
   {
     id: "users",
     title: "Usuários",
     description: "Acompanhe alunos, status de acesso e desempenho.",
-    path: "/administration/users",
+    path: ROUTE_PATHS.ADMINISTRATION_USERS,
     icon: "groups",
   },
 ];
