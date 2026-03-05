@@ -45,6 +45,10 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
 ### Administration - Users Management
 ![Administration Users](README-images/administration-users-page.png)
 
+### Administration - Calendar Management
+![Administration Calendar 01](README-images/administration-calendar-page-01.png)
+![Administration Calendar 02](README-images/administration-calendar-page-02.png)
+
 ### Questionnaire - Step 1 (Grade Selection)
 ![Questionnaire Step 1](README-images/questionnaire-001.png)
 
@@ -98,9 +102,17 @@ A modern, responsive web app built with React, TypeScript, and Vite. The project
   - Ranking summary panel with weekly awards and progression tips
 
 - 📅 **Calendar Page**
-  - Monthly grid calendar view
-  - Event-day indicators for quick visualization
-  - Compact monthly event list with date and time
+  - API-driven monthly calendar view (`POST /calendar-events/by-month`)
+  - Custom month/year selectors with clean dropdown UI
+  - Event badges by day and click-to-view day details
+  - Manual refresh and timeout/retry handling for monthly queries
+
+- 🗓️ **Administration Calendar Module**
+  - Event creation form with date, time, name, and description
+  - Add-event shortcut from selected calendar day
+  - Full event lifecycle in admin: create, edit (`PATCH`), and delete (`DELETE`)
+  - Confirmation modal for destructive delete action
+  - Day-focused event list with quick action buttons
 
 - ⚙️ **Settings Page**
   - User profile form with personal and academic fields
@@ -260,6 +272,7 @@ f-port-go/
 │           ├── Questions.tsx
 │           ├── Challenges.tsx
 │           ├── Users.tsx
+│           ├── Calendar.tsx
 │           ├── AdministrationShell.tsx
 │           ├── routes.ts
 │           └── components/
@@ -269,6 +282,7 @@ f-port-go/
 │               ├── AdministrationQuestionsContent.tsx
 │               ├── AdministrationChallengesContent.tsx
 │               ├── AdministrationUsersContent.tsx
+│               ├── AdministrationCalendarContent.tsx
 │               └── index.ts
 ├── public/                          # Static assets
 ├── README-images/                   # Screenshots for documentation

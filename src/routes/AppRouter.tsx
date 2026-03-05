@@ -14,6 +14,7 @@ import Administration from "../pages/Administration";
 import AdministrationQuestions from "../pages/Administration/Questions";
 import AdministrationChallenges from "../pages/Administration/Challenges";
 import AdministrationUsers from "../pages/Administration/Users";
+import AdministrationCalendar from "../pages/Administration/Calendar";
 import AdministrationShell from "../pages/Administration/AdministrationShell";
 import { ROUTE_PATHS } from "./paths";
 
@@ -78,6 +79,10 @@ export function AppRouter() {
         {
           path: "users",
           element: <AdministrationUsers />,
+        },
+        {
+          path: "calendar",
+          element: <AdministrationCalendar />,
         },
       ],
     },

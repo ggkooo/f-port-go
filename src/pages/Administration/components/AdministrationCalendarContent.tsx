@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getCalendarEventsByMonth, type CalendarEventItem } from "../../../services/calendarEventService";
+import {
+  createCalendarEvent,
+  deleteCalendarEvent,
+  getCalendarEventsByMonth,
+  updateCalendarEvent,
+  type CalendarEventItem,
+} from "../../../services/calendarEventService";
+import { ConfirmationModal } from "../../../components/ConfirmationModal";
 import { getSession } from "../../../services/session";
 
 const weekDays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const CALENDAR_MUTATION_TIMEOUT_MS = 12000;
 const CALENDAR_QUERY_TIMEOUT_MS = 30000;
 const CALENDAR_QUERY_TIMEOUT_MESSAGE = "A consulta de eventos demorou demais. Tente novamente.";
 const monthOptions = [
@@ -54,6 +62,34 @@ function getDayFromDate(value: string): number | null {
   return Number.isFinite(day) ? day : null;
 }
 
+function formatDateByDay(year: number, month: number, day: number): string {
+  const monthText = String(month).padStart(2, "0");
+  const dayText = String(day).padStart(2, "0");
+  return `${year}-${monthText}-${dayText}`;
+}
+
+function normalizeDateForInput(value: string): string {
+  if (value.includes("T")) {
+    return value.split("T")[0] ?? value;
+  }
+
+  return value;
+}
+
+function normalizeTimeForInput(value: string): string {
+  if (!value) {
+    return "";
+  }
+
+  const [hours = "", minutes = ""] = value.split(":");
+
+  if (!hours || !minutes) {
+    return value;
+  }
+
+  return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+}
+
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -72,59 +108,48 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMes
   }
 }
 
-async function getCalendarEventsByMonthWithRetry(month: number, year: number, token?: string): Promise<CalendarEventItem[]> {
-  try {
-    return await withTimeout(
-      getCalendarEventsByMonth({ month: String(month), year: String(year) }, token),
-      CALENDAR_QUERY_TIMEOUT_MS,
-      CALENDAR_QUERY_TIMEOUT_MESSAGE,
-    );
-  } catch (error) {
-    const isTimeoutError = error instanceof Error && error.message === CALENDAR_QUERY_TIMEOUT_MESSAGE;
-
-    if (!isTimeoutError) {
-      throw error;
-    }
-
-    return withTimeout(
-      getCalendarEventsByMonth({ month: String(month), year: String(year) }, token),
-      CALENDAR_QUERY_TIMEOUT_MS,
-      CALENDAR_QUERY_TIMEOUT_MESSAGE,
-    );
-  }
-}
-
-export function CalendarMainContent() {
+export function AdministrationCalendarContent() {
+  const formSectionRef = useRef<HTMLElement | null>(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const monthPickerRef = useRef<HTMLDivElement | null>(null);
   const yearPickerRef = useRef<HTMLDivElement | null>(null);
-
+  const isFetchingEventsRef = useRef(false);
+  const fetchRequestIdRef = useRef(0);
   const [events, setEvents] = useState<CalendarEventItem[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [eventsError, setEventsError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [editingEventId, setEditingEventId] = useState<number | null>(null);
+  const [activeEventActionId, setActiveEventActionId] = useState<number | null>(null);
+  const [eventPendingDeletion, setEventPendingDeletion] = useState<CalendarEventItem | null>(null);
+  const [formValues, setFormValues] = useState({
+    event_date: "",
+    event_time: "",
+    name: "",
+    description: "",
+  });
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [openPicker, setOpenPicker] = useState<"month" | "year" | null>(null);
 
   const today = new Date();
   const currentMonth = today.getMonth() + 1;
   const currentYear = today.getFullYear();
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
-
+  const [openPicker, setOpenPicker] = useState<"month" | "year" | null>(null);
   const yearOptions = useMemo(
     () => Array.from({ length: 7 }, (_, index) => currentYear - 3 + index),
     [currentYear],
   );
-
   const yearPickerOptions = useMemo<PickerOption[]>(
     () => yearOptions.map((value) => ({ value, label: String(value) })),
     [yearOptions],
   );
-
   const selectedMonthLabel = useMemo(
     () => monthOptions.find((monthOption) => monthOption.value === selectedMonth)?.label ?? "Mês",
     [selectedMonth],
   );
-
   const monthLabel = getMonthLabel(selectedMonth, selectedYear);
 
   useEffect(() => {
@@ -157,6 +182,14 @@ export function CalendarMainContent() {
   }, []);
 
   const fetchEvents = async () => {
+    if (isFetchingEventsRef.current) {
+      return;
+    }
+
+    isFetchingEventsRef.current = true;
+    const requestId = fetchRequestIdRef.current + 1;
+    fetchRequestIdRef.current = requestId;
+
     const session = getSession();
 
     setLoadingEvents(true);
@@ -164,14 +197,27 @@ export function CalendarMainContent() {
 
     try {
       const data = await getCalendarEventsByMonthWithRetry(selectedMonth, selectedYear, session?.token);
+
+      if (requestId !== fetchRequestIdRef.current) {
+        return;
+      }
+
       setEvents(data);
     } catch (error) {
+      if (requestId !== fetchRequestIdRef.current) {
+        return;
+      }
+
       setEvents([]);
       const message =
         error instanceof Error ? error.message : "Não foi possível carregar os eventos do mês.";
       setEventsError(message);
     } finally {
-      setLoadingEvents(false);
+      if (requestId === fetchRequestIdRef.current) {
+        setLoadingEvents(false);
+      }
+
+      isFetchingEventsRef.current = false;
     }
   };
 
@@ -201,7 +247,6 @@ export function CalendarMainContent() {
     () => getMonthDaysGrid(selectedMonth, selectedYear),
     [selectedMonth, selectedYear],
   );
-
   const selectedDayEvents = useMemo(() => {
     if (!selectedDay) {
       return [];
@@ -211,6 +256,166 @@ export function CalendarMainContent() {
       firstEvent.event_time.localeCompare(secondEvent.event_time),
     );
   }, [eventsByDay, selectedDay]);
+
+  const handleInputChange = (field: keyof typeof formValues, value: string) => {
+    setFormValues((previousValues) => ({
+      ...previousValues,
+      [field]: value,
+    }));
+  };
+
+  const handleSelectDay = (day: number) => {
+    setSelectedDay(day);
+  };
+
+  const handleAddEventFromSelectedDay = () => {
+    if (!selectedDay) {
+      return;
+    }
+
+    const selectedDate = formatDateByDay(selectedYear, selectedMonth, selectedDay);
+
+    setFormValues((previousValues) => ({
+      ...previousValues,
+      event_date: selectedDate,
+    }));
+
+    formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 250);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    const session = getSession();
+    if (!session) {
+      setSubmitError("Sessão inválida para cadastrar evento.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        event_date: normalizeDateForInput(formValues.event_date),
+        event_time: normalizeTimeForInput(formValues.event_time),
+        name: formValues.name.trim(),
+        description: formValues.description.trim(),
+      };
+
+      if (editingEventId) {
+        await withTimeout(
+          updateCalendarEvent(editingEventId, payload, session.token),
+          CALENDAR_MUTATION_TIMEOUT_MS,
+          "A atualização do evento demorou demais. Tente novamente.",
+        );
+
+        setEvents((previousEvents) =>
+          previousEvents.map((calendarEvent) =>
+            calendarEvent.id === editingEventId
+              ? {
+                ...calendarEvent,
+                ...payload,
+              }
+              : calendarEvent,
+          ),
+        );
+
+        setSubmitSuccess("Evento atualizado com sucesso.");
+      } else {
+        await withTimeout(
+          createCalendarEvent(payload, session.token),
+          CALENDAR_MUTATION_TIMEOUT_MS,
+          "O cadastro do evento demorou demais. Tente novamente.",
+        );
+
+        const createdEvent: CalendarEventItem = {
+          id: Date.now(),
+          ...payload,
+        };
+
+        setEvents((previousEvents) => [...previousEvents, createdEvent]);
+        setSubmitSuccess("Evento cadastrado com sucesso.");
+      }
+
+      setSelectedDay(getDayFromDate(formValues.event_date));
+      setEditingEventId(null);
+      setFormValues({ event_date: "", event_time: "", name: "", description: "" });
+
+      void fetchEvents();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível cadastrar o evento.";
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleStartEdit = (calendarEvent: CalendarEventItem) => {
+    setSubmitError(null);
+    setSubmitSuccess(null);
+    setEditingEventId(calendarEvent.id);
+    setFormValues({
+      event_date: normalizeDateForInput(calendarEvent.event_date),
+      event_time: normalizeTimeForInput(calendarEvent.event_time),
+      name: calendarEvent.name,
+      description: calendarEvent.description,
+    });
+
+    formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 250);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEventId(null);
+    setFormValues({ event_date: "", event_time: "", name: "", description: "" });
+    setSubmitError(null);
+  };
+
+  const handleDeleteEvent = async (calendarEvent: CalendarEventItem) => {
+    const session = getSession();
+
+    if (!session) {
+      setSubmitError("Sessão inválida para deletar evento.");
+      return;
+    }
+
+    setSubmitError(null);
+    setSubmitSuccess(null);
+    setActiveEventActionId(calendarEvent.id);
+
+    try {
+      await withTimeout(
+        deleteCalendarEvent(calendarEvent.id, session.token),
+        CALENDAR_MUTATION_TIMEOUT_MS,
+        "A exclusão do evento demorou demais. Tente novamente.",
+      );
+
+      setEvents((previousEvents) =>
+        previousEvents.filter((currentEvent) => currentEvent.id !== calendarEvent.id),
+      );
+
+      if (editingEventId === calendarEvent.id) {
+        handleCancelEdit();
+      }
+
+      setEventPendingDeletion(null);
+
+      setSubmitSuccess("Evento deletado com sucesso.");
+      void fetchEvents();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível deletar o evento.";
+      setSubmitError(message);
+    } finally {
+      setActiveEventActionId(null);
+    }
+  };
 
   return (
     <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
@@ -225,11 +430,93 @@ export function CalendarMainContent() {
               <span className="material-symbols-outlined text-blue-700 dark:text-blue-200">calendar_month</span>
             </div>
             <p className="text-neutral-500 dark:text-neutral-300 text-sm md:text-base">
-              Consulte os eventos por mês e clique em um dia para ver os detalhes.
+              Cadastre eventos e acompanhe a distribuição por dia no mês atual.
             </p>
           </div>
         </div>
       </header>
+
+      <section
+        ref={formSectionRef}
+        className="bg-white dark:bg-neutral-800 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700 p-4 md:p-6 mb-6"
+      >
+        <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-4">
+          {editingEventId ? "Editar evento" : "Novo evento"}
+        </h2>
+
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Data do evento</span>
+            <input
+              type="date"
+              value={formValues.event_date}
+              onChange={(event) => handleInputChange("event_date", event.target.value)}
+              required
+              className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Hora do evento</span>
+            <input
+              type="time"
+              value={formValues.event_time}
+              onChange={(event) => handleInputChange("event_time", event.target.value)}
+              required
+              className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 md:col-span-2">
+            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Nome</span>
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={formValues.name}
+              onChange={(event) => handleInputChange("name", event.target.value)}
+              placeholder="Nome do evento"
+              required
+              className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 md:col-span-2">
+            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Descrição</span>
+            <textarea
+              rows={3}
+              value={formValues.description}
+              onChange={(event) => handleInputChange("description", event.target.value)}
+              placeholder="Descrição do evento"
+              required
+              className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 px-4 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </label>
+
+          {submitError ? <p className="text-sm text-red-600 dark:text-red-300 md:col-span-2">{submitError}</p> : null}
+          {submitSuccess ? <p className="text-sm text-green-600 dark:text-green-300 md:col-span-2">{submitSuccess}</p> : null}
+
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? "Salvando..." : editingEventId ? "Salvar alterações" : "Cadastrar evento"}
+            </button>
+
+            {editingEventId ? (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                disabled={isSubmitting}
+                className="ml-2 px-4 py-2 rounded-xl text-sm font-bold bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancelar edição
+              </button>
+            ) : null}
+          </div>
+        </form>
+      </section>
 
       <section className="bg-white dark:bg-neutral-800 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700 p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
@@ -318,12 +605,27 @@ export function CalendarMainContent() {
               type="button"
               onClick={fetchEvents}
               disabled={loadingEvents}
-              className="h-10 px-4 py-2 rounded-xl text-sm font-semibold bg-neutral-900 dark:bg-blue-500 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-xl text-sm font-semibold bg-neutral-900 dark:bg-blue-500 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loadingEvents ? "Atualizando..." : "Atualizar"}
             </button>
           </div>
         </div>
+
+        {selectedDay ? (
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/40 px-4 py-3">
+            <p className="text-sm text-neutral-700 dark:text-neutral-200">
+              Dia <span className="font-bold">{selectedDay}</span> selecionado.
+            </p>
+            <button
+              type="button"
+              onClick={handleAddEventFromSelectedDay}
+              className="px-4 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Adicionar evento neste dia
+            </button>
+          </div>
+        ) : null}
 
         {eventsError ? <p className="text-sm text-red-600 dark:text-red-300 mb-4">{eventsError}</p> : null}
 
@@ -350,12 +652,13 @@ export function CalendarMainContent() {
             }
 
             const dayEvents = eventsByDay.get(day) ?? [];
+
             const isSelected = selectedDay === day;
 
             return (
               <button
                 type="button"
-                onClick={() => setSelectedDay(day)}
+                onClick={() => handleSelectDay(day)}
                 key={`${day}-${index}`}
                 className={`h-24 md:h-28 rounded-xl p-2 border text-left transition-colors ${
                   isSelected
@@ -414,6 +717,26 @@ export function CalendarMainContent() {
                     {calendarEvent.description ? (
                       <p className="text-xs text-neutral-500 dark:text-neutral-300 mt-1">{calendarEvent.description}</p>
                     ) : null}
+
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleStartEdit(calendarEvent)}
+                        disabled={activeEventActionId === calendarEvent.id}
+                        className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setEventPendingDeletion(calendarEvent)}
+                        disabled={activeEventActionId === calendarEvent.id}
+                        className="px-3 py-1 rounded-lg text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-900/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {activeEventActionId === calendarEvent.id ? "Deletando..." : "Deletar"}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -421,6 +744,48 @@ export function CalendarMainContent() {
           </div>
         ) : null}
       </section>
+
+      <ConfirmationModal
+        isOpen={eventPendingDeletion !== null}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja deletar este evento? Esta ação não poderá ser desfeita."
+        confirmLabel="Deletar evento"
+        cancelLabel="Cancelar"
+        onCancel={() => setEventPendingDeletion(null)}
+        onConfirm={() => {
+          if (!eventPendingDeletion) {
+            return;
+          }
+
+          handleDeleteEvent(eventPendingDeletion);
+        }}
+        isLoading={
+          eventPendingDeletion !== null &&
+          activeEventActionId === eventPendingDeletion.id
+        }
+      />
     </main>
   );
+}
+
+async function getCalendarEventsByMonthWithRetry(month: number, year: number, token?: string): Promise<CalendarEventItem[]> {
+  try {
+    return await withTimeout(
+      getCalendarEventsByMonth({ month: String(month), year: String(year) }, token),
+      CALENDAR_QUERY_TIMEOUT_MS,
+      CALENDAR_QUERY_TIMEOUT_MESSAGE,
+    );
+  } catch (error) {
+    const isTimeoutError = error instanceof Error && error.message === CALENDAR_QUERY_TIMEOUT_MESSAGE;
+
+    if (!isTimeoutError) {
+      throw error;
+    }
+
+    return withTimeout(
+      getCalendarEventsByMonth({ month: String(month), year: String(year) }, token),
+      CALENDAR_QUERY_TIMEOUT_MS,
+      CALENDAR_QUERY_TIMEOUT_MESSAGE,
+    );
+  }
 }
