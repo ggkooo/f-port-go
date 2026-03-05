@@ -43,8 +43,43 @@ const DEFAULT_DIFFICULTY_META: Omit<DifficultyOption, "key" | "label"> = {
   badgeClass: "text-neutral-700 dark:text-neutral-200",
 };
 
+function normalizeDifficultyName(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+const XP_BY_DIFFICULTY_NAME: Record<string, number> = {
+  facil: 15,
+  easy: 15,
+  medio: 25,
+  medium: 25,
+  dificil: 40,
+  hard: 40,
+};
+
+const XP_BY_DIFFICULTY_ID: Record<number, number> = {
+  1: 15,
+  2: 25,
+  3: 40,
+};
+
 export function getDifficultyMeta(name: string): Omit<DifficultyOption, "key" | "label"> {
   return DIFFICULTY_META_BY_NAME[name.trim().toLowerCase()] ?? DEFAULT_DIFFICULTY_META;
+}
+
+export function resolveDifficultyXp(difficultyId: number, difficultyName: string): number {
+  const xpById = XP_BY_DIFFICULTY_ID[difficultyId];
+  if (typeof xpById === "number") {
+    return xpById;
+  }
+
+  const normalizedName = normalizeDifficultyName(difficultyName);
+  const xpByName = XP_BY_DIFFICULTY_NAME[normalizedName];
+
+  return typeof xpByName === "number" ? xpByName : DEFAULT_DIFFICULTY_META.xp;
 }
 
 export const QUIZ_BY_ACTIVITY: Record<ActivityKey, LegacyQuizQuestion[]> = {

@@ -1,36 +1,6 @@
-interface RankingPlayer {
-  position: number;
-  name: string;
-  streak: number;
-  xp: number;
-  weeklyGain: string;
-}
-
-const topPlayers: RankingPlayer[] = [
-  { position: 1, name: "Ana Souza", streak: 87, xp: 32190, weeklyGain: "+1480" },
-  { position: 2, name: "Pedro Lima", streak: 72, xp: 31550, weeklyGain: "+1360" },
-  { position: 3, name: "Lucas Araújo", streak: 69, xp: 30840, weeklyGain: "+1310" },
-  { position: 4, name: "Marina Alves", streak: 65, xp: 30210, weeklyGain: "+1240" },
-  { position: 5, name: "Juliana Rocha", streak: 62, xp: 29870, weeklyGain: "+1190" },
-  { position: 6, name: "Rafael Nunes", streak: 58, xp: 29430, weeklyGain: "+1175" },
-  { position: 7, name: "Carla Mendes", streak: 56, xp: 29190, weeklyGain: "+1140" },
-  { position: 8, name: "Diego Martins", streak: 54, xp: 28610, weeklyGain: "+1090" },
-  { position: 9, name: "Beatriz Costa", streak: 51, xp: 28240, weeklyGain: "+1060" },
-  { position: 10, name: "Eduardo Braga", streak: 48, xp: 27880, weeklyGain: "+1020" },
-  { position: 11, name: "Fernanda Brito", streak: 46, xp: 27510, weeklyGain: "+980" },
-  { position: 12, name: "Ricardo Teixeira", streak: 43, xp: 27030, weeklyGain: "+940" },
-  { position: 13, name: "Natália Campos", streak: 41, xp: 26620, weeklyGain: "+920" },
-  { position: 14, name: "Gustavo Pires", streak: 39, xp: 26140, weeklyGain: "+890" },
-  { position: 15, name: "Patrícia Leal", streak: 37, xp: 25790, weeklyGain: "+850" },
-];
-
-const loggedUser: RankingPlayer = {
-  position: 42,
-  name: "Você",
-  streak: 16,
-  xp: 12450,
-  weeklyGain: "+560",
-};
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getSession } from "../../../services/session";
+import { getRanking, type RankingPlayer } from "../../../services/rankingService";
 
 function getPositionBadge(position: number) {
   if (position === 1) {
@@ -53,7 +23,66 @@ function formatXp(value: number) {
 }
 
 export function RankingMainContent() {
-  const gapToTop15 = topPlayers[topPlayers.length - 1].xp - loggedUser.xp;
+  const [players, setPlayers] = useState<RankingPlayer[]>([]);
+  const [top10Players, setTop10Players] = useState<RankingPlayer[]>([]);
+  const [apiLoggedUser, setApiLoggedUser] = useState<RankingPlayer | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const sessionUuid = getSession()?.uuid ?? null;
+
+  const loadRanking = useCallback(async () => {
+    const session = getSession();
+
+    if (!session?.token) {
+      setPlayers([]);
+      setErrorMessage("Sessão inválida para carregar o ranking.");
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const rankingData = await getRanking(session.token);
+      setPlayers(rankingData.ranking);
+      setTop10Players(rankingData.top10);
+      setApiLoggedUser(rankingData.loggedUser);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível carregar o ranking.";
+      setPlayers([]);
+      setTop10Players([]);
+      setApiLoggedUser(null);
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRanking();
+  }, [loadRanking]);
+
+  const topPlayers = useMemo(
+    () => (top10Players.length > 0 ? top10Players : players.slice(0, 10)),
+    [players, top10Players],
+  );
+
+  const loggedUser = useMemo(
+    () =>
+      apiLoggedUser ??
+      players.find((player) => player.isCurrentUser || (sessionUuid !== null && player.uuid === sessionUuid)) ??
+      null,
+    [apiLoggedUser, players, sessionUuid],
+  );
+
+  const gapToTop10 =
+    loggedUser && topPlayers.length > 0
+      ? Math.max(0, topPlayers[topPlayers.length - 1].xp - loggedUser.xp)
+      : 0;
+
+  const topUserPositionLabel = loggedUser ? `#${loggedUser.position}` : "-";
 
   return (
     <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
@@ -71,13 +100,13 @@ export function RankingMainContent() {
               <div>
                 <h3 className="font-bold text-neutral-900 dark:text-white">Disputa semanal ativa</h3>
                 <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-                  Continue estudando para subir posições e entrar no Top 15.
+                  Continue estudando para subir posições e entrar no Top 10.
                 </p>
               </div>
             </div>
 
             <span className="text-sm md:text-base font-semibold text-neutral-700 dark:text-neutral-200">
-              Você está em #{loggedUser.position}
+              Você está em {topUserPositionLabel}
             </span>
           </div>
         </div>
@@ -85,9 +114,32 @@ export function RankingMainContent() {
 
       <section className="bg-white dark:bg-neutral-800 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700 p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">Top 15 jogadores</h2>
-          <p className="text-xs md:text-sm text-neutral-500 dark:text-neutral-300">Atualizado há 2 minutos</p>
+          <h2 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">Top 10 jogadores</h2>
+          <p className="text-xs md:text-sm text-neutral-500 dark:text-neutral-300">Atualização em tempo real</p>
         </div>
+
+        {isLoading && (
+          <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300 mb-4">Carregando ranking...</p>
+        )}
+
+        {errorMessage && (
+          <div className="mb-4 rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 p-4 flex flex-wrap gap-3 items-center justify-between">
+            <p className="text-sm font-medium text-amber-700 dark:text-amber-200">{errorMessage}</p>
+            <button
+              type="button"
+              onClick={loadRanking}
+              className="px-4 py-2 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm font-semibold text-neutral-700 dark:text-neutral-200"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !errorMessage && topPlayers.length === 0 && (
+          <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300 mb-4">
+            Nenhum jogador encontrado no ranking.
+          </p>
+        )}
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px] border-separate border-spacing-y-2">
@@ -97,45 +149,48 @@ export function RankingMainContent() {
                 <th className="text-left text-xs font-bold uppercase tracking-wider text-neutral-400 px-4 py-2">Jogador</th>
                 <th className="text-left text-xs font-bold uppercase tracking-wider text-neutral-400 px-4 py-2">Ofensiva</th>
                 <th className="text-left text-xs font-bold uppercase tracking-wider text-neutral-400 px-4 py-2">XP Total</th>
-                <th className="text-left text-xs font-bold uppercase tracking-wider text-neutral-400 px-4 py-2">XP Semana</th>
               </tr>
             </thead>
 
             <tbody>
               {topPlayers.map((player) => (
-                <tr key={player.position} className="bg-neutral-100 dark:bg-neutral-700">
+                <tr key={`${player.position}-${player.uuid ?? player.name}`} className="bg-neutral-100 dark:bg-neutral-700">
                   <td className="px-4 py-3 rounded-l-2xl font-bold text-neutral-900 dark:text-white">{getPositionBadge(player.position)}</td>
                   <td className="px-4 py-3 font-semibold text-neutral-800 dark:text-neutral-100">{player.name}</td>
                   <td className="px-4 py-3 text-neutral-700 dark:text-neutral-200">{player.streak} dias</td>
-                  <td className="px-4 py-3 text-neutral-900 dark:text-white font-bold">{formatXp(player.xp)}</td>
-                  <td className="px-4 py-3 rounded-r-2xl text-emerald-700 dark:text-emerald-300 font-semibold">
-                    {player.weeklyGain}
-                  </td>
+                  <td className="px-4 py-3 rounded-r-2xl text-neutral-900 dark:text-white font-bold">{formatXp(player.xp)}</td>
                 </tr>
               ))}
 
-              <tr>
-                <td colSpan={5} className="px-2 py-3">
-                  <div className="h-px bg-neutral-200 dark:bg-neutral-700" />
-                </td>
-              </tr>
+              {loggedUser && !topPlayers.some((player) => player.uuid && player.uuid === loggedUser.uuid) && (
+                <>
+                  <tr>
+                    <td colSpan={4} className="px-2 py-3">
+                      <div className="h-px bg-neutral-200 dark:bg-neutral-700" />
+                    </td>
+                  </tr>
 
-              <tr className="bg-[#D4EAFC] dark:bg-blue-900/30">
-                <td className="px-4 py-4 rounded-l-2xl font-extrabold text-blue-900 dark:text-blue-100">#{loggedUser.position}</td>
-                <td className="px-4 py-4 font-extrabold text-blue-900 dark:text-blue-100">{loggedUser.name} (usuário logado)</td>
-                <td className="px-4 py-4 text-blue-800 dark:text-blue-200">{loggedUser.streak} dias</td>
-                <td className="px-4 py-4 text-blue-900 dark:text-blue-100 font-extrabold">{formatXp(loggedUser.xp)}</td>
-                <td className="px-4 py-4 rounded-r-2xl text-blue-800 dark:text-blue-200 font-bold">
-                  {loggedUser.weeklyGain}
-                </td>
-              </tr>
+                  <tr className="bg-[#D4EAFC] dark:bg-blue-900/30">
+                    <td className="px-4 py-4 rounded-l-2xl font-extrabold text-blue-900 dark:text-blue-100">
+                      #{loggedUser.position}
+                    </td>
+                    <td className="px-4 py-4 font-extrabold text-blue-900 dark:text-blue-100">
+                      {loggedUser.name} (usuário logado)
+                    </td>
+                    <td className="px-4 py-4 text-blue-800 dark:text-blue-200">{loggedUser.streak} dias</td>
+                    <td className="px-4 py-4 rounded-r-2xl text-blue-900 dark:text-blue-100 font-extrabold">{formatXp(loggedUser.xp)}</td>
+                  </tr>
+                </>
+              )}
             </tbody>
           </table>
         </div>
 
-        <p className="mt-4 text-sm text-neutral-500 dark:text-neutral-300">
-          Faltam <span className="font-bold text-neutral-700 dark:text-white">{formatXp(gapToTop15)} XP</span> para alcançar o Top 15.
-        </p>
+        {loggedUser && topPlayers.length > 0 && (
+          <p className="mt-4 text-sm text-neutral-500 dark:text-neutral-300">
+            Faltam <span className="font-bold text-neutral-700 dark:text-white">{formatXp(gapToTop10)} XP</span> para alcançar o Top 10.
+          </p>
+        )}
       </section>
     </main>
   );
