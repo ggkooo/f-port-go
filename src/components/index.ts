@@ -9,3 +9,4 @@ export { AppLeftSidebar } from "./AppLeftSidebar";
 export { AdminRoute } from "./AdminRoute";
 export { ProtectedRoute } from "./ProtectedRoute";
 export { PublicRoute } from "./PublicRoute";
+export { ConfirmationModal } from "./ConfirmationModal";

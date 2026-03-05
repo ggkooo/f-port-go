@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmationModal } from "../../../components/ConfirmationModal";
 import {
   createChallenge,
   getAllChallenges,
@@ -32,6 +33,7 @@ export function AdministrationChallengesContent() {
   const [editingChallengeId, setEditingChallengeId] = useState<number | null>(null);
   const [loadingEditingChallenge, setLoadingEditingChallenge] = useState(false);
   const [deletingChallengeId, setDeletingChallengeId] = useState<number | null>(null);
+  const [challengePendingDeletion, setChallengePendingDeletion] = useState<number | null>(null);
   const [challengeTypes, setChallengeTypes] = useState<ChallengeType[]>([]);
   const [loadingChallengeTypes, setLoadingChallengeTypes] = useState(false);
   const [challengeTypesError, setChallengeTypesError] = useState<string | null>(null);
@@ -176,10 +178,6 @@ export function AdministrationChallengesContent() {
   };
 
   const handleDeleteChallenge = async (challengeId: number) => {
-    if (!window.confirm("Tem certeza que deseja deletar este desafio?")) {
-      return;
-    }
-
     setDeletingChallengeId(challengeId);
     setSubmitError(null);
 
@@ -193,6 +191,7 @@ export function AdministrationChallengesContent() {
 
       await deleteChallenge(challengeId, session.token);
       setSubmitSuccess("Desafio deletado com sucesso.");
+      setChallengePendingDeletion(null);
       await fetchChallenges();
     } catch (error) {
       const message =
@@ -446,7 +445,7 @@ export function AdministrationChallengesContent() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteChallenge(challenge.id)}
+                        onClick={() => setChallengePendingDeletion(challenge.id)}
                         disabled={isSubmitting || deletingChallengeId === challenge.id}
                         className="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                       >
@@ -492,6 +491,25 @@ export function AdministrationChallengesContent() {
           </div>
         )}
       </section>
+
+      <ConfirmationModal
+        isOpen={challengePendingDeletion !== null}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja deletar este desafio? Esta ação não poderá ser desfeita."
+        confirmLabel="Deletar desafio"
+        cancelLabel="Cancelar"
+        onCancel={() => setChallengePendingDeletion(null)}
+        onConfirm={() => {
+          if (challengePendingDeletion === null) {
+            return;
+          }
+
+          handleDeleteChallenge(challengePendingDeletion);
+        }}
+        isLoading={
+          challengePendingDeletion !== null && deletingChallengeId === challengePendingDeletion
+        }
+      />
     </main>
   );
 }

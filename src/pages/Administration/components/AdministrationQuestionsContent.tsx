@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmationModal } from "../../../components/ConfirmationModal";
 import {
   getActivityTypes,
   getClasses,
@@ -49,6 +50,7 @@ export function AdministrationQuestionsContent() {
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
   const [loadingEditingQuestion, setLoadingEditingQuestion] = useState(false);
   const [deletingQuestionId, setDeletingQuestionId] = useState<number | null>(null);
+  const [questionPendingDeletion, setQuestionPendingDeletion] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchActivityTypes = async () => {
@@ -246,10 +248,6 @@ export function AdministrationQuestionsContent() {
   };
 
   const handleDeleteQuestion = async (questionId: number) => {
-    if (!window.confirm("Tem certeza que deseja deletar esta questão?")) {
-      return;
-    }
-
     setDeletingQuestionId(questionId);
     setSubmitError(null);
 
@@ -263,6 +261,7 @@ export function AdministrationQuestionsContent() {
 
       await deleteQuestion(questionId, session.token);
       setSubmitSuccess("Questão deletada com sucesso.");
+      setQuestionPendingDeletion(null);
       await fetchQuestions();
     } catch (error) {
       const message =
@@ -574,7 +573,7 @@ export function AdministrationQuestionsContent() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteQuestion(question.id)}
+                        onClick={() => setQuestionPendingDeletion(question.id)}
                         disabled={isSubmitting || deletingQuestionId === question.id}
                         className="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                       >
@@ -620,6 +619,25 @@ export function AdministrationQuestionsContent() {
           </div>
         )}
       </section>
+
+      <ConfirmationModal
+        isOpen={questionPendingDeletion !== null}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja deletar esta questão? Esta ação não poderá ser desfeita."
+        confirmLabel="Deletar questão"
+        cancelLabel="Cancelar"
+        onCancel={() => setQuestionPendingDeletion(null)}
+        onConfirm={() => {
+          if (questionPendingDeletion === null) {
+            return;
+          }
+
+          handleDeleteQuestion(questionPendingDeletion);
+        }}
+        isLoading={
+          questionPendingDeletion !== null && deletingQuestionId === questionPendingDeletion
+        }
+      />
     </main>
   );
 }
