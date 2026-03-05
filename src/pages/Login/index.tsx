@@ -34,10 +34,11 @@ function Login() {
         uuid,
         email: userEmail,
         token,
+        is_admin: isAdmin,
         profile_completed: profileCompleted,
       } = response.data;
 
-      saveSession({ uuid, email: userEmail, token, profileCompleted });
+      saveSession({ uuid, email: userEmail, token, isAdmin, profileCompleted });
 
       setSuccessMessage("Login realizado com sucesso.");
       navigate("/");

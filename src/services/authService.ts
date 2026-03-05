@@ -9,6 +9,7 @@ export type LoginResponse = {
   message: string;
   uuid: string;
   email: string;
+  is_admin: boolean;
   profile_completed: boolean;
   token: string;
 };

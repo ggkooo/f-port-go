@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { ProtectedRoute, PublicRoute } from './components'
+import { AdminRoute, ProtectedRoute, PublicRoute } from './components'
 import Login from "./pages/Login"
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
@@ -10,6 +10,10 @@ import Ranking from './pages/Ranking'
 import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 import Questionnaire from './pages/Questionnaire'
+import Administration from './pages/Administration'
+import AdministrationQuestions from './pages/Administration/Questions'
+import AdministrationChallenges from './pages/Administration/Challenges'
+import AdministrationUsers from './pages/Administration/Users'
 
 function App() {
   return (
@@ -21,6 +25,10 @@ function App() {
       <Route path="/store" element={<ProtectedRoute element={<Store />} />} />
       <Route path="/ranking" element={<ProtectedRoute element={<Ranking />} />} />
       <Route path="/calendar" element={<ProtectedRoute element={<Calendar />} />} />
+      <Route path="/administration" element={<AdminRoute element={<Administration />} />} />
+      <Route path="/administration/questions" element={<AdminRoute element={<AdministrationQuestions />} />} />
+      <Route path="/administration/challenges" element={<AdminRoute element={<AdministrationChallenges />} />} />
+      <Route path="/administration/users" element={<AdminRoute element={<AdministrationUsers />} />} />
       <Route path="/settings" element={<ProtectedRoute element={<Settings />} />} />
       <Route path="/questionnaire" element={<ProtectedRoute element={<Questionnaire />} />} />
       <Route path="/" element={<ProtectedRoute element={<Home />} />} />
