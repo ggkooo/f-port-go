@@ -13,6 +13,7 @@ export const ROUTE_PATHS = {
   ADMINISTRATION_QUESTIONS: "/administration/questions",
   ADMINISTRATION_CHALLENGES: "/administration/challenges",
   ADMINISTRATION_USERS: "/administration/users",
+  ADMINISTRATION_CALENDAR: "/administration/calendar",
 } as const;
 
 export type AppRoutePath =

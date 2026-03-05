@@ -23,6 +23,13 @@ const adminModules = [
     path: ROUTE_PATHS.ADMINISTRATION_USERS,
     icon: "groups",
   },
+  {
+    id: "calendar",
+    title: "Calendário",
+    description: "Cadastre eventos e visualize as atividades por dia.",
+    path: ROUTE_PATHS.ADMINISTRATION_CALENDAR,
+    icon: "calendar_month",
+  },
 ];
 
 export function AdministrationMainContent() {
