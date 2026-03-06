@@ -1,4 +1,8 @@
-export const AUTH_API_BASE_URL = "http://localhost:8000/api";
+const envApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const AUTH_API_BASE_URL = (envApiBaseUrl && envApiBaseUrl.length > 0
+  ? envApiBaseUrl
+  : "http://localhost:8000/api").replace(/\/$/, "");
 export const AUTH_API_KEY =
   "347df2c2e273c2d3db310872294422266549286f5b51080b2915d0b3118cc30b";
 
