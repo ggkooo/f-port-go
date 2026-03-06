@@ -22,8 +22,8 @@ export function RegisterForm({
   };
 
   return (
-    <div className="w-full md:w-1/2 p-6 md:p-10 xl:p-14 flex flex-col justify-center bg-white dark:bg-neutral-900 h-full">
-      <div className="max-w-sm mx-auto w-full">
+    <div className="w-full md:w-1/2 p-6 md:p-10 xl:p-14 flex flex-col justify-start bg-white dark:bg-neutral-900 h-full min-h-0 overflow-y-auto">
+      <div className="max-w-sm mx-auto w-full pt-2 pb-4 md:pt-3 md:pb-2">
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl font-extrabold text-neutral-900 dark:text-white mb-3">

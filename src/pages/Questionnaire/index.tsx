@@ -15,10 +15,12 @@ import {
   syncChallengeProgressFromSession,
 } from "../../services/challengeService";
 import { syncTodayStreakCompletion } from "../../services/streakService";
+import { updateUserXp } from "../../services/xpService";
 import {
   HELP_ACTIONS,
   OPTION_STYLE_BY_INDEX,
   getDifficultyMeta,
+  resolveDifficultyXp,
 } from "./data";
 import {
   DifficultySelectionStep,
@@ -93,11 +95,16 @@ function Questionnaire() {
   const [quizStartedAtMs, setQuizStartedAtMs] = useState<number | null>(null);
   const [challengeSyncStatus, setChallengeSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
   const [challengeSyncError, setChallengeSyncError] = useState<string | null>(null);
+  const [xpSyncStatus, setXpSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
+  const [xpSyncError, setXpSyncError] = useState<string | null>(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
   const [isExitConfirmationOpen, setIsExitConfirmationOpen] = useState(false);
   const isQuizInProgress = hasStartedQuiz && !isQuizFinished;
 
   const selectedDifficultyData = difficultyOptions.find((option) => option.key === selectedDifficulty);
+  const lessonXpAmount = selectedDifficultyData
+    ? resolveDifficultyXp(selectedDifficultyData.key, selectedDifficultyData.label)
+    : 0;
   const selectedActivityType = useMemo(
     () => activityTypes.find((activityType) => activityType.id === selectedActivityTypeId) ?? null,
     [activityTypes, selectedActivityTypeId],
@@ -114,7 +121,7 @@ function Questionnaire() {
 
   const currentQuestion = currentRoundQuestions[currentQuestionPointer] ?? null;
   const isLastInRound = currentQuestionPointer === currentRoundQuestions.length - 1;
-  const earnedXp = isQuizFinished && selectedDifficultyData ? selectedDifficultyData.xp : 0;
+  const earnedXp = isQuizFinished ? lessonXpAmount : 0;
   const progressPercentage = currentRoundQuestions.length
     ? Math.round(((currentQuestionPointer + 1) / currentRoundQuestions.length) * 100)
     : 0;
@@ -349,6 +356,30 @@ function Questionnaire() {
   }, [bestStreak, challengeSyncStatus, elapsedSeconds, isQuizFinished, metricsStorageKey]);
 
   useEffect(() => {
+    if (!isQuizFinished || xpSyncStatus !== "idle" || !selectedDifficultyData) {
+      return;
+    }
+
+    const session = getSession();
+    if (!session?.uuid || !session.token) {
+      return;
+    }
+
+    setXpSyncStatus("syncing");
+    setXpSyncError(null);
+
+    updateUserXp(session.uuid, lessonXpAmount, session.token)
+      .then(() => {
+        setXpSyncStatus("success");
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : "Não foi possível atualizar o XP da lição.";
+        setXpSyncStatus("error");
+        setXpSyncError(message);
+      });
+  }, [isQuizFinished, lessonXpAmount, selectedDifficultyData, xpSyncStatus]);
+
+  useEffect(() => {
     if (!isQuizInProgress) {
       return;
     }
@@ -387,6 +418,8 @@ function Questionnaire() {
     setQuizStartedAtMs(null);
     setChallengeSyncStatus("idle");
     setChallengeSyncError(null);
+    setXpSyncStatus("idle");
+    setXpSyncError(null);
     setIsQuizFinished(false);
   };
 
@@ -452,6 +485,8 @@ function Questionnaire() {
         setQuizStartedAtMs(Date.now());
         setChallengeSyncStatus("idle");
         setChallengeSyncError(null);
+        setXpSyncStatus("idle");
+        setXpSyncError(null);
         setIsQuizFinished(false);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Não foi possível carregar as questões.";
@@ -692,7 +727,7 @@ function Questionnaire() {
                   activityLabel={activityLabel}
                   selectedGrade={selectedGrade}
                   selectedDifficultyLabel={selectedDifficultyData.label}
-                  lessonXp={selectedDifficultyData.xp}
+                  lessonXp={lessonXpAmount}
                   questionCountLabel={`${MIN_QUESTION_QUANTITY} a ${MAX_QUESTION_QUANTITY} (sorteado ao iniciar)`}
                   isLoading={loadingQuestions || loadingActivityTypes}
                   onStartQuiz={handleStartQuiz}
@@ -733,6 +768,21 @@ function Questionnaire() {
               {selectedGrade && selectedDifficulty && selectedDifficultyData && isQuizFinished && (
                 <>
                   <FinishedStep earnedXp={earnedXp} bestStreak={bestStreak} onBackHome={() => navigate("/")} />
+                  {xpSyncStatus === "syncing" && (
+                    <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300 mt-3">
+                      Computando XP da lição...
+                    </p>
+                  )}
+                  {xpSyncStatus === "success" && (
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 mt-3">
+                      XP da lição computado com sucesso.
+                    </p>
+                  )}
+                  {xpSyncStatus === "error" && (
+                    <p className="text-sm font-medium text-amber-700 dark:text-amber-300 mt-3">
+                      {xpSyncError ?? "Não foi possível computar o XP da lição."}
+                    </p>
+                  )}
                   {challengeSyncStatus === "syncing" && (
                     <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300 mt-3">
                       Atualizando progresso dos desafios do dia...
@@ -758,7 +808,7 @@ function Questionnaire() {
             activityLabel={activityLabel}
             selectedGrade={selectedGrade}
             selectedDifficultyLabel={selectedDifficultyData?.label}
-            lessonXp={selectedDifficultyData?.xp}
+            lessonXp={selectedDifficultyData ? lessonXpAmount : undefined}
             currentStreak={currentStreak}
             bestStreak={bestStreak}
             storedBestStreak={storedBestStreak}
