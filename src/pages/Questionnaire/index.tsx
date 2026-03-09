@@ -565,16 +565,21 @@ function Questionnaire() {
       return;
     }
 
+    // Seleciona aleatoriamente 2 alternativas erradas para esconder
     const wrongIndexes = currentQuestion.options
       .map((_, index) => index)
       .filter((index) => index !== currentQuestion.correctOptionIndex);
 
+    // Embaralha as alternativas erradas
+    const shuffled = [...wrongIndexes].sort(() => Math.random() - 0.5);
+    const toHide = shuffled.slice(0, 2);
+
     setHelpUsage((previousValue) => ({ ...previousValue, removeTwo: true }));
     setHiddenOptionsByQuestionId((previousValue) => ({
       ...previousValue,
-      [currentQuestion.id]: wrongIndexes.slice(0, 2),
+      [currentQuestion.id]: toHide,
     }));
-    if (selectedOptionIndex !== null && wrongIndexes.slice(0, 2).includes(selectedOptionIndex)) {
+    if (selectedOptionIndex !== null && toHide.includes(selectedOptionIndex)) {
       setSelectedOptionIndex(null);
     }
     setHelpMessage("REMOVER 2 ALTERNATIVAS aplicado nesta questão.");
@@ -585,15 +590,15 @@ function Questionnaire() {
       return;
     }
 
-    const nextRetryList = pendingRetryQuestionIds.includes(currentQuestion.id)
-      ? pendingRetryQuestionIds
-      : [...pendingRetryQuestionIds, currentQuestion.id];
-
+    // Ao pular, marca como correta e não adiciona à lista de revisão
     setHelpUsage((previousValue) => ({ ...previousValue, skipQuestion: true }));
-    setCurrentStreak(0);
-    setLastAnswerResult("wrong");
-    setHelpMessage("PULAR QUESTÃO usado: esta questão foi enviada para revisão no final da rodada.");
-    advanceQuestionFlow(nextRetryList);
+    const nextStreak = currentStreak + 1;
+    setCurrentStreak(nextStreak);
+    setBestStreak((previousValue) => (nextStreak > previousValue ? nextStreak : previousValue));
+    setLastAnswerResult("correct");
+    setHelpMessage("PULAR QUESTÃO usado: esta questão foi marcada como concluída.");
+    // Avança sem adicionar à lista de revisão
+    advanceQuestionFlow(pendingRetryQuestionIds);
   };
 
   const handleExitQuestionnaire = () => {
