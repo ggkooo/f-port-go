@@ -84,6 +84,11 @@ export function RankingMainContent() {
 
   const topUserPositionLabel = loggedUser ? `#${loggedUser.position}` : "-";
 
+  // Render prop: if children is a function, call it with loggedUser and also render the ranking table
+  // eslint-disable-next-line react/prop-types
+  // @ts-ignore
+  const childrenFn = typeof arguments[0]?.children === "function" ? arguments[0].children : null;
+
   return (
     <main className="flex-1 min-h-0 p-4 pb-24 md:p-6 md:pb-6 lg:p-8 lg:pb-8 overflow-y-auto">
       <header className="mb-6">
@@ -192,6 +197,8 @@ export function RankingMainContent() {
           </p>
         )}
       </section>
+
+      {childrenFn && childrenFn(loggedUser)}
     </main>
   );
 }

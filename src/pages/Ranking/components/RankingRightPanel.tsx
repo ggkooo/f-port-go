@@ -1,8 +1,13 @@
-const weeklyAwards = [
-  "Top 1: 500 moedas + Badge Lendário",
-  "Top 2-5: 300 moedas + Badge Elite",
-  "Top 6-15: 150 moedas + Badge Destaque",
-];
+
+// @ts-ignore
+type RankingPlayer = {
+  position: number;
+  name: string;
+  streak: number;
+  xp: number;
+  uuid: string | null;
+  isCurrentUser: boolean;
+};
 
 const rankingTips = [
   "Concluir desafios diários acelera seu ganho de XP semanal.",
@@ -10,7 +15,11 @@ const rankingTips = [
   "Use poções de XP da loja em sessões longas de estudo.",
 ];
 
-export function RankingRightPanel() {
+type RankingRightPanelProps = {
+  loggedUser: RankingPlayer | null;
+};
+
+export function RankingRightPanel({ loggedUser }: RankingRightPanelProps) {
   return (
     <aside className="w-80 bg-neutral-100 dark:bg-neutral-800 m-3 rounded-[2rem] p-5 flex-col gap-5 hidden 2xl:flex">
       <div className="flex items-center justify-between mb-2">
@@ -25,20 +34,15 @@ export function RankingRightPanel() {
 
       <div className="bg-white dark:bg-neutral-700 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-600">
         <p className="text-xs uppercase font-bold tracking-wider text-neutral-400 mb-1">Sua posição</p>
-        <p className="text-2xl font-extrabold text-neutral-900 dark:text-white">#42</p>
-        <p className="text-sm text-neutral-500 dark:text-neutral-300 mt-1">Você subiu 3 posições nesta semana.</p>
+        <p className="text-2xl font-extrabold text-neutral-900 dark:text-white">
+          {loggedUser ? `#${loggedUser.position}` : "-"}
+        </p>
+        <p className="text-sm text-neutral-500 dark:text-neutral-300 mt-1">
+          {loggedUser ? `Você está em ${loggedUser.position === 1 ? "primeiro" : `#${loggedUser.position}`}` : "Posição não encontrada."}
+        </p>
       </div>
 
-      <div>
-        <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-wider mb-3">Premiações Semanais</h2>
-        <div className="flex flex-col gap-3">
-          {weeklyAwards.map((award) => (
-            <div key={award} className="bg-white dark:bg-neutral-700 p-4 rounded-2xl shadow-sm">
-              <p className="text-sm font-semibold text-neutral-900 dark:text-white leading-relaxed">{award}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ...existing code... */}
 
       <div className="bg-[#FDE68A] dark:bg-amber-900/30 rounded-2xl p-4">
         <h3 className="text-sm font-bold text-amber-900 dark:text-amber-100 mb-2">Como subir mais rápido</h3>
