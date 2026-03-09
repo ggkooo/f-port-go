@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import type { AnswerResult, HelpAction, OptionStyle, QuizQuestion } from "../types";
 
 interface HelpUsage {
@@ -55,7 +55,6 @@ export function QuizStep({
   const optionButtonRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   // Usar altura mínima fixa para evitar flicker visual
   const MIN_OPTION_HEIGHT = 64; // px
-  const [uniformOptionHeight, setUniformOptionHeight] = useState<number>(MIN_OPTION_HEIGHT);
 
   const elapsedMinutes = Math.floor(elapsedSeconds / 60);
   const elapsedRemainingSeconds = elapsedSeconds % 60;

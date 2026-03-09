@@ -3,7 +3,9 @@ type ConfirmationModalProps = {
   title: string;
   description: string;
   confirmLabel?: string;
+  cancelLabel?: string;
   onConfirm: () => void;
+  onCancel?: () => void;
   isLoading?: boolean;
   footer?: React.ReactNode;
   children?: React.ReactNode;
