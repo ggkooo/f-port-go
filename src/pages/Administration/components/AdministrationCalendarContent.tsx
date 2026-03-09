@@ -519,95 +519,90 @@ export function AdministrationCalendarContent() {
       </section>
 
       <section className="bg-white dark:bg-neutral-800 rounded-large shadow-sm border border-neutral-100 dark:border-neutral-700 p-4 md:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-xl font-bold text-neutral-900 dark:text-white">Eventos de {monthLabel}</h2>
-
-          <div className="flex items-center gap-2">
-            <div ref={monthPickerRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setOpenPicker((previousValue) => (previousValue === "month" ? null : "month"))}
-                className="h-10 min-w-36 rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 pl-3 pr-9 text-sm font-medium text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-300 text-left"
-              >
-                {selectedMonthLabel}
-              </button>
-              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-neutral-400 dark:text-neutral-300">
-                <span className="material-symbols-outlined text-[18px]">expand_more</span>
-              </span>
-
-              {openPicker === "month" ? (
-                <div className="absolute z-20 mt-2 w-full max-h-60 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 shadow-sm">
-                  {monthOptions.map((monthOption) => {
-                    const isActive = monthOption.value === selectedMonth;
-
-                    return (
-                      <button
-                        key={monthOption.value}
-                        type="button"
-                        onClick={() => {
-                          setSelectedMonth(monthOption.value);
-                          setOpenPicker(null);
-                        }}
-                        className={`w-full px-3 py-2 text-left text-sm transition-colors ${
-                          isActive
-                            ? "bg-[#D4EAFC] dark:bg-blue-900/40 text-blue-900 dark:text-blue-100"
-                            : "text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-600"
-                        }`}
-                      >
-                        {monthOption.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+          <h2 className="text-lg md:text-xl font-bold text-neutral-900 dark:text-white mb-2 md:mb-0">Eventos de {monthLabel}</h2>
+          <div className="w-full flex flex-col gap-2 md:flex-row md:items-center md:justify-end md:w-auto">
+            <div className="flex gap-2 w-full md:w-auto md:flex-row">
+              <div ref={monthPickerRef} className="relative w-1/2 md:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setOpenPicker((previousValue) => (previousValue === 'month' ? null : 'month'))}
+                  className="h-10 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 pl-3 pr-9 text-sm font-medium text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-300 text-left"
+                >
+                  {selectedMonthLabel}
+                </button>
+                <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-neutral-400 dark:text-neutral-300">
+                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                </span>
+                {openPicker === 'month' ? (
+                  <div className="absolute z-20 mt-2 w-full max-h-60 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 shadow-sm">
+                    {monthOptions.map((monthOption) => {
+                      const isActive = monthOption.value === selectedMonth;
+                      return (
+                        <button
+                          key={monthOption.value}
+                          type="button"
+                          onClick={() => {
+                            setSelectedMonth(monthOption.value);
+                            setOpenPicker(null);
+                          }}
+                          className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                            isActive
+                              ? 'bg-[#D4EAFC] dark:bg-blue-900/40 text-blue-900 dark:text-blue-100'
+                              : 'text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-600'
+                          }`}
+                        >
+                          {monthOption.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+              <div ref={yearPickerRef} className="relative w-1/2 md:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setOpenPicker((previousValue) => (previousValue === 'year' ? null : 'year'))}
+                  className="h-10 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 pl-3 pr-9 text-sm font-medium text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-300 text-left"
+                >
+                  {selectedYear}
+                </button>
+                <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-neutral-400 dark:text-neutral-300">
+                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                </span>
+                {openPicker === 'year' ? (
+                  <div className="absolute z-20 mt-2 w-full max-h-60 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 shadow-sm">
+                    {yearPickerOptions.map((yearOption) => {
+                      const isActive = yearOption.value === selectedYear;
+                      return (
+                        <button
+                          key={yearOption.value}
+                          type="button"
+                          onClick={() => {
+                            setSelectedYear(yearOption.value);
+                            setOpenPicker(null);
+                          }}
+                          className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                            isActive
+                              ? 'bg-[#D4EAFC] dark:bg-blue-900/40 text-blue-900 dark:text-blue-100'
+                              : 'text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-600'
+                          }`}
+                        >
+                          {yearOption.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             </div>
-
-            <div ref={yearPickerRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setOpenPicker((previousValue) => (previousValue === "year" ? null : "year"))}
-                className="h-10 min-w-28 rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 pl-3 pr-9 text-sm font-medium text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-300 text-left"
-              >
-                {selectedYear}
-              </button>
-              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-neutral-400 dark:text-neutral-300">
-                <span className="material-symbols-outlined text-[18px]">expand_more</span>
-              </span>
-
-              {openPicker === "year" ? (
-                <div className="absolute z-20 mt-2 w-full max-h-60 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 shadow-sm">
-                  {yearPickerOptions.map((yearOption) => {
-                    const isActive = yearOption.value === selectedYear;
-
-                    return (
-                      <button
-                        key={yearOption.value}
-                        type="button"
-                        onClick={() => {
-                          setSelectedYear(yearOption.value);
-                          setOpenPicker(null);
-                        }}
-                        className={`w-full px-3 py-2 text-left text-sm transition-colors ${
-                          isActive
-                            ? "bg-[#D4EAFC] dark:bg-blue-900/40 text-blue-900 dark:text-blue-100"
-                            : "text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-600"
-                        }`}
-                      >
-                        {yearOption.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
-
             <button
               type="button"
               onClick={fetchEvents}
               disabled={loadingEvents}
-              className="px-4 py-2 rounded-xl text-sm font-semibold bg-neutral-900 dark:bg-blue-500 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-10 w-full mt-2 rounded-xl text-sm font-semibold bg-neutral-900 dark:bg-blue-500 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed md:mt-0 md:w-auto md:min-w-[120px]"
             >
-              {loadingEvents ? "Atualizando..." : "Atualizar"}
+              {loadingEvents ? 'Atualizando...' : 'Atualizar'}
             </button>
           </div>
         </div>
