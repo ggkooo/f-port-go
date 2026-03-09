@@ -741,28 +741,30 @@ function Questionnaire() {
               )}
 
               {selectedGrade && selectedDifficulty && selectedDifficultyData && hasStartedQuiz && currentQuestion && (
-                <QuizStep
-                  activityLabel={activityLabel}
-                  retryRoundNumber={retryRoundNumber}
-                  currentQuestionPointer={currentQuestionPointer}
-                  currentRoundLength={currentRoundQuestions.length}
-                  currentStreak={currentStreak}
-                  elapsedSeconds={elapsedSeconds}
-                  progressPercentage={progressPercentage}
-                  lastAnswerResult={lastAnswerResult}
-                  helpMessage={helpMessage}
-                  currentQuestion={currentQuestion}
-                  selectedOptionIndex={selectedOptionIndex}
-                  hiddenOptionIndexes={hiddenOptionsByQuestionId[currentQuestion.id] ?? []}
-                  optionStyles={OPTION_STYLE_BY_INDEX}
-                  helpActions={HELP_ACTIONS}
-                  helpUsage={helpUsage}
-                  onUseHint={handleUseHint}
-                  onUseRemoveThree={handleUseRemoveThree}
-                  onUseSkipQuestion={handleUseSkipQuestion}
-                  onSelectOption={setSelectedOptionIndex}
-                  onAnswerAndContinue={handleAnswerAndContinue}
-                />
+                <div className="transition-all duration-300 ease-in-out">
+                  <QuizStep
+                    activityLabel={activityLabel}
+                    retryRoundNumber={retryRoundNumber}
+                    currentQuestionPointer={currentQuestionPointer}
+                    currentRoundLength={currentRoundQuestions.length}
+                    currentStreak={currentStreak}
+                    elapsedSeconds={elapsedSeconds}
+                    progressPercentage={progressPercentage}
+                    lastAnswerResult={lastAnswerResult}
+                    helpMessage={helpMessage}
+                    currentQuestion={currentQuestion}
+                    selectedOptionIndex={selectedOptionIndex}
+                    hiddenOptionIndexes={hiddenOptionsByQuestionId[currentQuestion.id] ?? []}
+                    optionStyles={OPTION_STYLE_BY_INDEX}
+                    helpActions={HELP_ACTIONS}
+                    helpUsage={helpUsage}
+                    onUseHint={handleUseHint}
+                    onUseRemoveThree={handleUseRemoveThree}
+                    onUseSkipQuestion={handleUseSkipQuestion}
+                    onSelectOption={setSelectedOptionIndex}
+                    onAnswerAndContinue={handleAnswerAndContinue}
+                  />
+                </div>
               )}
 
               {selectedGrade && selectedDifficulty && selectedDifficultyData && isQuizFinished && (
